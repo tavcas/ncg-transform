@@ -160,7 +160,7 @@ fn get_merge_parent_definitions(cart: &Cart) -> Vec<ComponentParent> {
                     // Creating a new ComponentParent with static child relationship
                     merge_parent_definitions.push(ComponentParent {
                         id: line.id.clone(),  // Assuming the parent is the current line
-                        component_reference: vec!["8496446931253".to_string()],
+                        component_reference: vec!["44201767567526".to_string()],
                         component_quantities: vec![1],  // Assuming quantity is 1
                         price_adjustment: Some(50.0),  // You can adjust this as necessary
                     });
@@ -179,7 +179,7 @@ fn get_merge_parent_definitions(cart: &Cart) -> Vec<ComponentParent> {
                 if let Some(merchandise) = &variant {
                     merge_parent_definitions.push(ComponentParent {
                         id: line.id.clone(),  // Use the line item ID as the parent ID
-                        component_reference: vec!["gid://shopify/ProductVariant/8496446931253".to_owned()],  // Set the component reference as the line item ID
+                        component_reference: vec!["gid://shopify/ProductVariant/44201767567526".to_owned()],  // Set the component reference as the line item ID
                         component_quantities: vec![1],  // Set the component quantity as 1
                         price_adjustment: Some(50.0),  // Adjust the price if necessary
                     });
@@ -284,7 +284,7 @@ fn get_component_quantities(_variant: &InputCartLinesMerchandiseOnProductVariant
 
 fn get_component_references(_variant: &InputCartLinesMerchandiseOnProductVariant) -> Vec<ID> {
     // Always return a vector with a single ID. Replace "single_id" with the actual ID
-    vec!["gid://shopify/ProductVariant/8496446931253".to_owned()]
+    vec!["gid://shopify/ProductVariant/44201767567526".to_owned()]
 }
 
 
