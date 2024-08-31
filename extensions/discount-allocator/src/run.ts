@@ -38,7 +38,7 @@ export function run(input: RunInput): FunctionRunResult {
           } else {
             displayableErrors.push({
               discountId: discount.id,
-              reason: `Discount proposal ${proposal.handle} is targetting non existing`
+              reason: `Discount proposal ${proposal.handle} is targetting non existing cart line`
             })
           }
         }
