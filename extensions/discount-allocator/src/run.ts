@@ -2,13 +2,14 @@ import type {
   RunInput,
   FunctionRunResult,
   LineDiscount,
-  DisplayableError
+  DisplayableError,
+  FixedAmount
 } from "../generated/api.ts";
 
 const ALLOCATIONS = {
   "Monthly": (amount: number) => amount,
-  "Bi-Monthly": (amount: number) => Math.round(amount / 2),
-  "Every Two Weeks": (amount: number) => Math.round(amount / 2)
+  "Bi-Monthly": (amount: number) => amount / 2,
+  "Every Two Weeks": (amount: number) => amount / 2
 }
 
 export function run(input: RunInput): FunctionRunResult {
@@ -23,7 +24,7 @@ export function run(input: RunInput): FunctionRunResult {
         for( let target of proposal.targets) {
           const line = lines.find(l => l.id === target.cartLineId);
           if(line) {
-            const amount = allocation(Number(proposal.value));
+            const amount = allocation(Number((proposal.value as FixedAmount).amount));
             lineDiscounts.push({
               cartLineId: line.id,
               quantity: 1,

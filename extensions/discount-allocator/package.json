@@ -2,11 +2,12 @@
   "name": "discount-allocator",
   "version": "0.0.1",
   "license": "UNLICENSED",
+  "type": "module",
   "scripts": {
     "shopify": "npm exec -- shopify",
     "typegen": "npm exec -- shopify app function typegen",
     "build": "npm exec -- shopify app function build",
-    "preview": "npm exec -- shopify app function run --input test.json",
+    "preview": "npm exec -- shopify app function run --input input.json",
     "test": "vitest"
   },
   "codegen": {

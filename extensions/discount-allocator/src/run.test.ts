@@ -1,19 +1,12 @@
 import {describe, it, expect} from 'vitest';
 import {run} from './run';
-import Decimal from 'decimal.js';
+import fs from "fs";
+import { RunInput } from '../generated/api';
 
 describe('discounts allocator function', () => {
-  it('returns no discounts without configuration', () => {
-    const result = run({
-      shop: {
-        metafield: null
-      }
-    });
-    const expected: FunctionResult = {
-      displayableErrors: [],
-      lineDiscounts: [],
-    };
-
-    expect(result).toEqual(expected);
-  });
+  it('input.json', () => {
+    const input = JSON.parse(fs.readFileSync('input.json').toString()) as RunInput;
+    const result = run(input);
+    expect(result.lineDiscounts?.pop()?.allocations.pop()?.amount ?? 0).toBe(2.5)
+  })
 });

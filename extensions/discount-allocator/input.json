@@ -1,0 +1,40 @@
+{
+  "cart": {
+    "plan": { "value": "Every Two Weeks" },
+    "lines": [
+      {
+        "id": "gid://shopify/CartLine/1",
+        "quantity": 1,
+        "plan": { "value": "Every Two Weeks" },
+        "cost": { "totalAmount": { "amount": 100 } },
+        "merchandise": {
+          "id": "gid://shopify/ProductVariant/1",
+          "product": {
+            "id": "gid://shopify/Product/1"
+          }
+        }
+      }
+    ]
+  },
+  "discounts": [
+    {
+      "id": "gid://shopify/Discount/1",
+      "discountProposals": [
+        {
+          "handle": "1",
+          "message": "Test Discount",
+          "value": {
+            "amount": 5,
+            "appliesToEachItem": false
+          },
+          "targets": [
+            {
+              "cartLineId": "gid://shopify/CartLine/1",
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
