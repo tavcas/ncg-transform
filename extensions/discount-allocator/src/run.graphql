@@ -26,6 +26,9 @@ query RunInput {
     }
     discounts {
         id 
+        code
+        discountClass
+        discountApplicationStrategy
         discountProposals {
             handle
             message

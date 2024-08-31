@@ -1,0 +1,6 @@
+query RunInput {
+  cart {
+    plan: metafield(key: "Payment Plan") { value }
+  }
+
+}
