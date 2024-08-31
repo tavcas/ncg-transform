@@ -155,15 +155,22 @@ fn get_merge_parent_definitions(cart: &Cart) -> Vec<ComponentParent> {
         if let Some(ref payment) = line.payment_plan {
             if let Some(ref value) = payment.value {
                 if value == "Monthly" {
-                    attributes = "None";
-                } else {
                     // Creating a new ComponentParent with static child relationship
                     merge_parent_definitions.push(ComponentParent {
                         id: line.id.clone(),  // Assuming the parent is the current line
                         component_reference: vec!["44201767567526".to_string()],
                         component_quantities: vec![1],  // Assuming quantity is 1
-                        price_adjustment: Some(50.0),  // You can adjust this as necessary
+                        price_adjustment: Some(88.8888),  // You can adjust this as necessary
                     });
+                }
+                else if value == "Bi-Monthly" || value == "Every Two Weeks" {
+                                        // Creating a new ComponentParent with static child relationship
+                                        merge_parent_definitions.push(ComponentParent {
+                                            id: line.id.clone(),  // Assuming the parent is the current line
+                                            component_reference: vec!["44201767567526".to_string()],
+                                            component_quantities: vec![1],  // Assuming quantity is 1
+                                            price_adjustment: Some(94.4444),  // You can adjust this as necessary
+                                        });
                 }
             }
         }
@@ -205,7 +212,7 @@ fn get_component_parents(variant: &InputCartLinesMerchandiseOnProductVariant) ->
 
             component_parents.push(ComponentParent {
                 id: parent_definition.id.clone(),
-                component_reference: vec!["8496446931253".to_string()],
+                component_reference: vec!["44201767567526".to_string()],
                 component_quantities: vec![1],  // Assuming quantity is 1
                 price_adjustment: Some(50.0),  // You can adjust this as necessary
             });
@@ -228,7 +235,7 @@ fn get_expand_cart_operations(cart: &Cart) -> Vec<CartOperation> {
 let mut attributes = String::from("test");
 if let Some(ref payment) = line.payment_plan {
     if let Some(ref value) = payment.value {
-        if value == "Monthly" {
+        if value == "Cash" {
             attributes = String::from("None");
         } else {
             attributes = String::from("");
@@ -242,7 +249,21 @@ if let Some(ref payment) = line.payment_plan {
         }
 
         if let Some(merchandise) = &variant {
-            let component_references: Vec<ID> = get_component_references(&merchandise);
+            let mut payment_value: Option<&str> = None;
+
+if let Some(ref payment) = line.payment_plan {
+    if let Some(ref value) = payment.value {
+        payment_value = Some(value);
+    }
+}
+let component_references: Vec<ID> = match payment_value {
+    Some("Monthly") => get_component_references_mo(&merchandise),
+    Some("Bi-Monthly") | Some("Every Two Weeks") => get_component_references_bi(&merchandise),
+    _ => {
+        // Handle any other cases or defaults here.
+        Vec::new()  // return an empty Vec instead of None
+    }
+};
             let component_quantities: Vec<i64> = get_component_quantities(&merchandise);
 
             if component_references.is_empty() || component_references.len() != component_quantities.len() || attributes == "None"  {
@@ -260,9 +281,22 @@ for (reference, quantity) in component_references.iter().zip(component_quantitie
 
     expand_relationships.push(expand_relationship);
 }
-            
+let mut payment_value: Option<&str> = None;
 
-            let price: Option<PriceAdjustment> = get_price_adjustment(&merchandise);
+if let Some(ref payment) = line.payment_plan {
+    if let Some(ref value) = payment.value {
+        payment_value = Some(value);
+    }
+}
+
+let price: Option<PriceAdjustment> = match payment_value {
+    Some("Monthly") => calculate_monthly_price(&merchandise),
+    Some("Bi-Monthly") | Some("Every Two Weeks") => calculate_bi_weekly_price(&merchandise),
+    _ => {
+        // Handle any other cases or defaults here.
+        None
+    }
+};
 
             let expand_operation: ExpandOperation = ExpandOperation{
                 cart_line_id: line.id.clone(),
@@ -282,18 +316,31 @@ fn get_component_quantities(_variant: &InputCartLinesMerchandiseOnProductVariant
     vec![1]
 }
 
-fn get_component_references(_variant: &InputCartLinesMerchandiseOnProductVariant) -> Vec<ID> {
+fn get_component_references_bi(_variant: &InputCartLinesMerchandiseOnProductVariant) -> Vec<ID> {
     // Always return a vector with a single ID. Replace "single_id" with the actual ID
-    vec!["gid://shopify/ProductVariant/44201767567526".to_owned()]
+    vec!["gid://shopify/ProductVariant/46250760110389".to_owned()]
 }
 
+fn get_component_references_mo(_variant: &InputCartLinesMerchandiseOnProductVariant) -> Vec<ID> {
+    // Always return a vector with a single ID. Replace "single_id" with the actual ID
+    vec!["gid://shopify/ProductVariant/46499859726645".to_owned()]
+}
 
-fn get_price_adjustment(_variant: &InputCartLinesMerchandiseOnProductVariant) -> Option<PriceAdjustment> {
+fn calculate_monthly_price(_variant: &InputCartLinesMerchandiseOnProductVariant) -> Option<PriceAdjustment> {
     // Always return a price adjustment of 50.0
     Some(PriceAdjustment {
         percentage_decrease: Some(PriceAdjustmentValue {
-            value: "50.0".to_owned(),
+            value: "88.8888".to_owned(),
         }),
     })
 }
+fn calculate_bi_weekly_price(_variant: &InputCartLinesMerchandiseOnProductVariant) -> Option<PriceAdjustment> {
+    // Always return a price adjustment of 50.0
+    Some(PriceAdjustment {
+        percentage_decrease: Some(PriceAdjustmentValue {
+            value: "94.4444".to_owned(),
+        }),
+    })
+}
+
 

@@ -1,0 +1,44 @@
+query RunInput {
+    cart {
+        plan: attribute(key: "Payment Plan") {
+            value
+        }
+        lines {
+            id
+            quantity
+            plan: attribute(key: "Payment Plan") {
+                value
+            }
+            cost {
+                totalAmount {
+                    amount
+                }
+            }
+            merchandise {
+                ...on ProductVariant {
+                    id 
+                    product {
+                        id
+                    }
+                }
+            }
+        }
+    }
+    discounts {
+        id 
+        discountProposals {
+            handle
+            message
+            value {
+                ...on FixedAmount {
+                    amount
+                    appliesToEachItem
+                }
+            }
+            targets {
+                cartLineId
+                quantity
+            }
+        }
+    }
+}

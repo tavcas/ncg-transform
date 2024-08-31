@@ -2,18 +2,18 @@
 
 name = "ncg-transform"
 client_id = "6e776e5c13cd8cb0aa631f32d1bfc539"
-application_url = "https://we-shelf-volunteers-degrees.trycloudflare.com"
+application_url = "https://blood-separate-were-premium.trycloudflare.com"
 embedded = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products,write_cart_transforms"
+scopes = "write_products, write_discounts, write_discounts_allocator_functions, read_products, write_cart_transforms"
 
 [auth]
 redirect_urls = [
-  "https://we-shelf-volunteers-degrees.trycloudflare.com/auth/callback",
-  "https://we-shelf-volunteers-degrees.trycloudflare.com/auth/shopify/callback",
-  "https://we-shelf-volunteers-degrees.trycloudflare.com/api/auth/callback"
+  "https://blood-separate-were-premium.trycloudflare.com/auth/callback",
+  "https://blood-separate-were-premium.trycloudflare.com/auth/shopify/callback",
+  "https://blood-separate-were-premium.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
