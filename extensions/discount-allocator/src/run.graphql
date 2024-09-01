@@ -5,22 +5,8 @@ query RunInput {
         }
         lines {
             id
-            quantity
             plan: attribute(key: "Payment Plan") {
                 value
-            }
-            cost {
-                totalAmount {
-                    amount
-                }
-            }
-            merchandise {
-                ...on ProductVariant {
-                    id 
-                    product {
-                        id
-                    }
-                }
             }
         }
     }

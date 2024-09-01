@@ -8,7 +8,7 @@ import {
   DiscountApplicationStrategy,
   DiscountProposal,
   Value,
-  CartLineTarget
+  CartLineTarget,
 } from "../generated/api.ts";
 
 enum PaymentPlan {
@@ -21,11 +21,8 @@ enum PaymentPlan {
 type ArrayElement<ArrayType extends readonly unknown[] | null | undefined> = 
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
-const ALLOCATIONS = {
-  [PaymentPlan.Monthly]: (amount: number) => amount,
-  [PaymentPlan.BiMonthly]: (amount: number) => amount / 2,
-  [PaymentPlan.EveryTwoWeeks]: (amount: number) => amount / 2
-}
+type DiscountInput = ArrayElement<RunInput["discounts"]>;
+type LineInput = ArrayElement<RunInput["cart"]["lines"]>;
 
 function reduceByPaymentPlan(plan: PaymentPlan, amount: number) {
   switch(plan) {
@@ -54,7 +51,7 @@ function fixedAmount(value: Value) {
   }
 }
 
- const mapTargetsToAllocations = (targets: CartLineTarget[], amount: Number, proposalHandle: string) => 
+ const mapTargetsToOrderAllocation = (targets: CartLineTarget[], amount: Number, proposalHandle: string) => 
   targets.map(({ cartLineId, quantity }) => ({
     cartLineId,
     quantity,
@@ -65,60 +62,22 @@ function fixedAmount(value: Value) {
       }
     ]
   }) as LineDiscount);
-  
-
-export function run(input: RunInput): FunctionRunResult {
-  const { lines, plan } = input.cart;
-  const displayableErrors: DisplayableError[] = [];
-  const lineDiscounts: LineDiscount[] = [];
-  for( let discount of input.discounts?.sort(({ discountApplicationStrategy}, _) => discountApplicationStrategy === DiscountApplicationStrategy.First ? 1 : -1).reverse() ?? []) {
-    switch (discount.discountClass) {
-      case DiscountClass.Order:
-        allocateOrderDiscount(discount, plan, lineDiscounts, displayableErrors); 
-        break;
-      case DiscountClass.Product:
-        for (let proposal of discount.discountProposals ) {
-       
-          for( let target of proposal.targets) {
-            const line = lines.find(l => l.id === target.cartLineId);
-            if(line) {
-              const { amount }  = (proposal.value as FixedAmount);
-              const allocation =  line.plan && line.plan.value ? ALLOCATIONS[line.plan.value](Number(amount)) : Number(amount);
-              lineDiscounts.push({
-                cartLineId: line.id,
-                quantity: 1,
-                allocations: [
-                  {
-                    amount: allocation,
-                    discountProposalId: `gid://shopify/DiscountProposal/${proposal.handle}`
-                  }
-                ]
-              });
-  
-            } else {
-              displayableErrors.push({
-                discountId: discount.id,
-                reason: `Discount proposal ${proposal.handle} is targetting non existing cart line`
-              })
-            }
-          }
-       }
-        break;
-    }
-
-  }
-  return { lineDiscounts, displayableErrors };
-}
 
 
 
-function allocateOrderDiscount(discount: ArrayElement<RunInput["discounts"]>, cartPlan: PaymentPlan): FunctionRunResult {
+
+const mergeResults = (...results: FunctionRunResult[]) => results.reduce((p, c) => ({ 
+  displayableErrors: [...(p.displayableErrors ?? []), ...(c.displayableErrors ?? [])],
+  lineDiscounts: [...(p.lineDiscounts ?? []), ...(p.lineDiscounts ?? [])]
+}), {});
+
+function allocateOrderDiscount(discount: DiscountInput, cartPlan: PaymentPlan): FunctionRunResult {
   const lineDiscounts: LineDiscount[] = []
   const displayableErrors: DisplayableError[] = []
   for (let proposal of findProposalByStrategy(discount.discountApplicationStrategy, discount.discountProposals as DiscountProposal[])) {
     const amount = fixedAmount(proposal.value);
     const allocation = reduceByPaymentPlan(cartPlan, amount);
-    const allocations = mapTargetsToAllocations(proposal.targets, allocation, proposal.handle);
+    const allocations = mapTargetsToOrderAllocation(proposal.targets, allocation, proposal.handle);
     if (allocations && allocations.length > 0) {
       lineDiscounts.push(...allocations);
     } else {
@@ -131,3 +90,59 @@ function allocateOrderDiscount(discount: ArrayElement<RunInput["discounts"]>, ca
 
   return { lineDiscounts, displayableErrors }
 }
+
+
+
+function allocateProductDiscount(discount: DiscountInput, lines: LineInput[]): FunctionRunResult {
+  const lineDiscounts: LineDiscount[] = []
+  const displayableErrors: DisplayableError[] = []
+  for (let proposal of findProposalByStrategy(discount.discountApplicationStrategy, discount.discountProposals as DiscountProposal[])) {
+    const proposalDiscounts = proposal.targets
+    .filter(({ cartLineId }) => lines.findIndex(l => l.id === cartLineId))
+    .map(({ cartLineId, quantity }) => {
+      const { plan } = lines.find(({ id }) => id === cartLineId) ?? {};
+      const amount = fixedAmount(proposal.value);
+      const linePlan = PaymentPlan[plan?.value ?? ""];
+      const allocation = reduceByPaymentPlan(linePlan, amount);
+      return {
+        cartLineId,
+        quantity,
+        allocations: [
+          {
+            amount: allocation,
+            discountProposalId: `gid://shopify/DiscountProposal/${proposal.handle}`
+          }
+        ]
+      } as LineDiscount
+    });
+    if(proposalDiscounts && proposalDiscounts.length > 0) {
+      lineDiscounts.push(...proposalDiscounts);
+    } else {
+      displayableErrors.push({
+        discountId: discount.id,
+        reason: `No valid allocations for "${proposal.message}"`
+      });
+    }
+  }
+
+  return { lineDiscounts, displayableErrors }
+}
+  
+
+export function run(input: RunInput): FunctionRunResult {
+  const { plan, lines } = input.cart;
+  const result = input.discounts?.map(d => {
+    switch(d.discountClass) {
+      case DiscountClass.Order: 
+      return allocateOrderDiscount(d, PaymentPlan[plan?.value ?? ""])
+      case DiscountClass.Product:
+        return allocateProductDiscount(d, lines);
+    }
+  }) ?? [];
+  return mergeResults(...result)
+}
+
+
+
+
+
