@@ -21,7 +21,6 @@ query RunInput {
             value {
                 ...on FixedAmount {
                     amount
-                    appliesToEachItem
                 }
             }
             targets {
