@@ -1,0 +1,26 @@
+{
+    "data": {
+        "discountsAllocatorFunctionRegister": {
+            "success": false,
+            "userErrors": [
+                {
+                    "field": [
+                        "functionExtensionId"
+                    ],
+                    "message": "The shop is not eligible for discounts allocator functions."
+                }
+            ]
+        }
+    },
+    "extensions": {
+        "cost": {
+            "requestedQueryCost": 10,
+            "actualQueryCost": 10,
+            "throttleStatus": {
+                "maximumAvailable": 20000,
+                "currentlyAvailable": 19990,
+                "restoreRate": 1000
+            }
+        }
+    }
+}
