@@ -1,9 +1,14 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-name = "ncg-transform"
-client_id = "6e776e5c13cd8cb0aa631f32d1bfc539"
-application_url = "https://blood-separate-were-premium.trycloudflare.com"
+client_id = "ccd6dca5cef9a6768abf3f13bf48e944"
+name = "ncg-transform-dev"
+handle = "ncg-transform-dev"
+application_url = "https://biological-seas-cancelled-graphs.trycloudflare.com/"
 embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "ncg-test-environment.myshopify.com"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
@@ -11,9 +16,9 @@ scopes = "write_products, write_discounts, write_discounts_allocator_functions, 
 
 [auth]
 redirect_urls = [
-  "https://blood-separate-were-premium.trycloudflare.com/auth/callback",
-  "https://blood-separate-were-premium.trycloudflare.com/auth/shopify/callback",
-  "https://blood-separate-were-premium.trycloudflare.com/api/auth/callback"
+  "https://biological-seas-cancelled-graphs.trycloudflare.com/auth/callback",
+  "https://biological-seas-cancelled-graphs.trycloudflare.com/auth/shopify/callback",
+  "https://biological-seas-cancelled-graphs.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
@@ -21,7 +26,3 @@ api_version = "2023-07"
 
 [pos]
 embedded = false
-
-[build]
-automatically_update_urls_on_dev = true
-dev_store_url = "deks-tech-theme.myshopify.com"

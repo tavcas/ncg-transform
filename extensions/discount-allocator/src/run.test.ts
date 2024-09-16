@@ -35,11 +35,46 @@ const orderFirstBiMonthly: RunInput = {
   ]
 }
 
-describe('discounts allocator function', () => {
-  it('should halve fixed discount for order when cart plan is Bi-Monthly and discountClass is ORDER and discountStrategy is FIRST', () => {
+describe('Discount Allocator By Payment Plan (Fixed amount)', () => {
+  describe('Given plan is Monthly', () => {
+    it('Then it should keep same discount amount', () => {
+
+    })
+  });
+  describe('Given plan is Bi-Monthly', () => {
+    describe('When applies to order', () => {
+      it('then it should apply half discount amount to order', () => {
+
+      })
+    });
+    describe('When Applies to Product', () => {
+      it('then it should apply full amount to lines with Monthly plan', () => {
+
+      });
+      it('and it should apply half amount to lines with Bi-Monthly plan')
+    });
+  });
+  describe('Every Two Weeks', () => {
+    describe('When applies to order', () => {
+      it('then it should apply half discount amount to order', () => {
+
+      })
+    });
+    describe('When Applies to Product', () => {
+      it('then it should apply full amount to lines with Monthly plan', () => {
+
+      });
+      it('and it should apply half amount to lines with Every Two Weeks plan', () => {
+
+      });
+    });
+  })
+  it('Discount ', () => {
     const { lineDiscounts, displayableErrors } = run(orderFirstBiMonthly);
     const { amount } = first(first(lineDiscounts).allocations);
     expect(displayableErrors?.length).toBe(0);
     expect(amount).toBe(2.5);
-  })
+  });
+
+  it('should halve fixed discount for order when cart plan')
 });

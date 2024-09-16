@@ -13,9 +13,10 @@ description = "t:description"
   export = "run"
 
   [extensions.build]
-  command = ""
+  command = "yarn build"
   path = "dist/function.wasm"
 
   [extensions.ui.paths]
-  create = "/"
-  details = "/"
+[extensions.ui.paths]
+  create = "/app/discount-allocator/:functionId/new"
+  details = "/app/discount-allocator/:functionId/:id"
