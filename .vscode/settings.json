@@ -1,0 +1,6 @@
+{
+    "dependi.npm.lockFileEnabled": false,
+    "search.exclude": {
+        "**/node_modules": false
+    }
+}

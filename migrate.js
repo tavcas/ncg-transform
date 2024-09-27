@@ -1,23 +1,30 @@
 // @ts-ignore
-const Migrations = require('migrations');
+import Migrations from 'migrations';
   // @ts-ignore
-const MetaFile = require('migrations/lib/meta/file');
-const shopify = require('app/shopify.server');
+import db from './app/db.server.js';
+import sp from 'synchronized-promise';
 
-function ShopifyMetafield({ namespace, key}) {
-    this.opts = opts;
-    this.get = () => {};
-    this.set = () => {};
+console.log(sp(db.shopifyMigration.findMany, { timeouts: 1000000})())
+
+function ShopifyMeta() {
+    this.get = () => ({
+      migrations: sp(db.shopifyMigration.findMany, { timeouts: 1000000})() ?? []
+    })
+    this.set = ({ migrations }) => {
+      sp(db.shopifyMigration.deleteMany)()
+      migrations.forEach(m => sp(db.shopifyMigration.create)(m));
+    };
 };
 
-
-module.exports = new Migrations({
+const migration = new Migrations({
   // @ts-ignore
-  dir: __dirname + '/migrations', // directory with migration files
+  dir: './migrations', // directory with migration files
   // @ts-ignore
-  meta: new MetaFile({path: __dirname + '/migrations.json'}), // meta information storage
+  meta: new ShopifyMeta(), // meta information storage
   // @ts-ignore
   template: '', // template used by `--create` flag to generate a new migration file
 });
 
-module.exports.run();
+export default migration;
+
+migration.run();

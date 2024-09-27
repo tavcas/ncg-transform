@@ -1,7 +1,6 @@
 query RunInput {
   discount: discountNode {
-    halfAmount: metafield(namespace: "$app:discount", key: "half-amount") { value }
-    halfPercentage: metafield(namespace: "$app:discount", key: "half-amount") { value }
+    configuration: metafield(namespace: "$app:paymentplan-discount", key: "value") { value }
   }
   cart {
     plan: attribute(key: "Payment Plan") { value }

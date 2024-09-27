@@ -1,6 +1,17 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { run, EMPTY_DISCOUNT } from './index';
+import { run, EMPTY_DISCOUNT, DiscountValue } from './index';
 import { DiscountApplicationStrategy } from '../generated/api';
+
+const fixedAmountConfiguration: DiscountValue = {
+  type: "fixedAmount",
+  full: 5,
+  half: 2.5
+};
+
+const percentageConfiguration: DiscountValue =  {
+  ...fixedAmountConfiguration,
+  type: "percentage"
+};
 
 let result = EMPTY_DISCOUNT;
 describe('order discounts by payment plan', () => {
@@ -31,7 +42,7 @@ describe('order discounts by payment plan', () => {
         plan: { value: "Bi-Monthly"}
       },
       discount: {
-        halfAmount: { value: "2.5"}
+        configuration: { value: JSON.stringify(fixedAmountConfiguration) }
       }
     });
 
@@ -45,7 +56,7 @@ describe('order discounts by payment plan', () => {
         plan: { value: "Every Two Weeks"}
       },
       discount: {
-        halfAmount: { value: "2.5"}
+        configuration: { value: JSON.stringify(fixedAmountConfiguration) }
       }
     });
 
@@ -59,7 +70,7 @@ describe('order discounts by payment plan', () => {
         plan: { value: "Bi-Monthly"}
       },
       discount: {
-        halfPercentage: { value: "2.5"}
+        configuration: { value: JSON.stringify(percentageConfiguration) }
       }
     });
 
@@ -73,7 +84,7 @@ describe('order discounts by payment plan', () => {
         plan: { value: "Every Two Weeks"}
       },
       discount: {
-        halfPercentage: { value: "2.5"}
+        configuration: { value: JSON.stringify(percentageConfiguration) }
       }
     });
 
