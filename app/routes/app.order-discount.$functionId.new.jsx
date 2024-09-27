@@ -35,7 +35,10 @@ import {
   LegacyStack
 } from "@shopify/polaris";
 
-import shopify from "../shopify.server";
+import shopify from "../shopify.server.js";
+
+
+
 
 // [START build-the-ui.add-action]
 export const action = async ({ params, request }) => {

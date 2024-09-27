@@ -1,9 +1,0 @@
-mutation discountsAllocatorFunctionRegister($functionExtensionId: String!) {
-  discountsAllocatorFunctionRegister(functionExtensionId: $functionExtensionId) {
-    success
-    userErrors {
-      field
-      message
-    }
-  }
-}
