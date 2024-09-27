@@ -3,3 +3,7 @@ build:
     web: Dockerfile
   config:
     SHOPIFY_API_KEY: 6e776e5c13cd8cb0aa631f32d1bfc539
+    SHOPIFY_CART_TRANSFORMER_ID: 7a215176-69e4-43d9-9e89-2ef1f1d8162d
+    SHOPIFY_ORDER_DISCOUNTS_ID: 9aa45dea-6ad8-4644-949f-be4e9910bb1b
+    SHOPIFY_API_SECRET: 8e1e3203cadb7b2ec930e8f1a49e290f
+    SCOPES: read_products,write_cart_transforms,write_discounts,write_discounts_allocator_functions,write_products
