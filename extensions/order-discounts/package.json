@@ -1,13 +1,12 @@
 {
-  "name": "discount-allocator",
+  "name": "order-discounts",
   "version": "0.0.1",
   "license": "UNLICENSED",
-  "type": "module",
   "scripts": {
     "shopify": "npm exec -- shopify",
     "typegen": "npm exec -- shopify app function typegen",
     "build": "npm exec -- shopify app function build",
-    "preview": "npm exec -- shopify app function run --input input.json",
+    "preview": "npm exec -- shopify app function run",
     "test": "vitest --reporter=verbose"
   },
   "codegen": {
@@ -26,12 +25,10 @@
     }
   },
   "devDependencies": {
-    "@vitest/coverage-c8": "^0.33.0",
     "vitest": "^0.29.8"
   },
   "dependencies": {
     "@shopify/shopify_function": "0.1.0",
-    "decimal.js": "^10.4.3",
     "javy": "0.1.1"
   }
 }
