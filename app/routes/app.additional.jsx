@@ -6,7 +6,7 @@ import {
   List,
   Page,
   Text,
-  VerticalStack,
+  LegacyStack,
 } from "@shopify/polaris";
 
 export default function AdditionalPage() {
@@ -16,7 +16,7 @@ export default function AdditionalPage() {
       <Layout>
         <Layout.Section>
           <Card>
-            <VerticalStack gap="3">
+            <LegacyStack gap="3">
               <Text as="p" variant="bodyMd">
                 The app template comes with an additional page which
                 demonstrates how to create multiple pages within app navigation
@@ -35,12 +35,12 @@ export default function AdditionalPage() {
                 link to it in the <Code>&lt;ui-nav-menu&gt;</Code> component
                 found in <Code>app/routes/app.jsx</Code>.
               </Text>
-            </VerticalStack>
+            </LegacyStack>
           </Card>
         </Layout.Section>
         <Layout.Section secondary>
           <Card>
-            <VerticalStack gap="2">
+            <LegacyStack gap="2">
               <Text as="h2" variant="headingMd">
                 Resources
               </Text>
@@ -54,7 +54,7 @@ export default function AdditionalPage() {
                   </Link>
                 </List.Item>
               </List>
-            </VerticalStack>
+            </LegacyStack>
           </Card>
         </Layout.Section>
       </Layout>

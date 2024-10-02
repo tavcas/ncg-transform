@@ -292,13 +292,13 @@ export default function DiscountPaymentPlanNew() {
                       label="For Monthly or no payment type"
                       autoComplete="on"
                       {...configuration.full}
-                      suffix={configuration.type.value === "percentage" ? "%" : ""}
+                      suffix={configuration.discountType.value === "percentage" ? "%" : ""}
                     />
                     <TextField
                       label="For Bi-Monthly or Every Two Weeks"
                       autoComplete="on"
                       {...configuration.percentage}
-                      suffix={configuration.type.value === "percentage" ? "%" : ""}
+                      suffix={configuration.discountType.value === "percentage" ? "%" : ""}
                     />
                   </LegacyStack>
                 </Card>

@@ -17,5 +17,5 @@ description = "t:description"
   path = "dist/function.wasm"
 
   [extensions.ui.paths]
-  create = "/app/order-discount/:functionId/new"
-  details = "/app/order-discount/:functionId/:id"
+  create = "/app/order/code/:functionId/new"
+  details = "/app/order/code/:functionId/:id"

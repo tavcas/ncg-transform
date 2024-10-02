@@ -32,7 +32,7 @@ export default function App() {
         data-api-key={apiKey}
       />
 
-      <DiscountProvider locale="en-US" ianaTimezone="America/NewYork">
+      <DiscountProvider locale="en-US" ianaTimezone="America/New_York">
       <ui-nav-menu>
         <Link to="/app" rel="home">
           Home

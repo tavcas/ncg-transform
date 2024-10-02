@@ -3,11 +3,11 @@
 client_id = "952fc59953bdc2206b9ead351b810388"
 name = "ncg-transform-dev"
 handle = "ncg-transform-dev"
-application_url = "https://personally-positive-sheep.ngrok-free.app"
+application_url = "https://managed-carmen-responses-wit.trycloudflare.com"
 embedded = true
 
 [build]
-automatically_update_urls_on_dev = false
+automatically_update_urls_on_dev = true
 dev_store_url = "dekstech-dev.myshopify.com"
 include_config_on_deploy = true
 
@@ -17,9 +17,9 @@ scopes = "read_products,write_cart_transforms,write_discounts,write_discounts_al
 
 [auth]
 redirect_urls = [
-  "https://personally-positive-sheep.ngrok-free.app/auth/callback",
-  "https://personally-positive-sheep.ngrok-free.app/auth/shopify/callback",
-  "https://personally-positive-sheep.ngrok-free.app/api/auth/callback"
+  "https://managed-carmen-responses-wit.trycloudflare.com/auth/callback",
+  "https://managed-carmen-responses-wit.trycloudflare.com/auth/shopify/callback",
+  "https://managed-carmen-responses-wit.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

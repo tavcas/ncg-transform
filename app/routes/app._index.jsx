@@ -10,10 +10,9 @@ import {
   Page,
   Layout,
   Text,
-  VerticalStack,
   Card,
   Button,
-  HorizontalStack,
+  LegacyStack,
   Box,
   Divider,
   List,
@@ -102,12 +101,12 @@ export default function Index() {
           Generate a product
         </button>
       </ui-title-bar>
-      <VerticalStack gap="5">
+      <LegacyStack gap="5">
         <Layout>
           <Layout.Section>
             <Card>
-              <VerticalStack gap="5">
-                <VerticalStack gap="2">
+              <LegacyStack gap="5">
+                <LegacyStack gap="2">
                   <Text as="h2" variant="headingMd">
                     Congrats on creating a new Shopify app 🎉
                   </Text>
@@ -133,8 +132,8 @@ export default function Index() {
                     mutation demo, to provide a starting point for app
                     development.
                   </Text>
-                </VerticalStack>
-                <VerticalStack gap="2">
+                </LegacyStack>
+                <LegacyStack gap="2">
                   <Text as="h3" variant="headingMd">
                     Get started with products
                   </Text>
@@ -149,8 +148,8 @@ export default function Index() {
                     </Link>{" "}
                     mutation in our API references.
                   </Text>
-                </VerticalStack>
-                <HorizontalStack gap="3" align="end">
+                </LegacyStack>
+                <LegacyStack gap="3" align="end">
                   {actionData?.product && (
                     <Button
                       url={`https://admin.shopify.com/store/${shop}/admin/products/${productId}`}
@@ -162,7 +161,7 @@ export default function Index() {
                   <Button loading={isLoading} primary onClick={generateProduct}>
                     Generate a product
                   </Button>
-                </HorizontalStack>
+                </LegacyStack>
                 {actionData?.product && (
                   <Box
                     padding="4"
@@ -177,37 +176,37 @@ export default function Index() {
                     </pre>
                   </Box>
                 )}
-              </VerticalStack>
+              </LegacyStack>
             </Card>
           </Layout.Section>
           <Layout.Section secondary>
-            <VerticalStack gap="5">
+            <LegacyStack gap="5">
               <Card>
-                <VerticalStack gap="2">
+                <LegacyStack gap="2">
                   <Text as="h2" variant="headingMd">
                     App template specs
                   </Text>
-                  <VerticalStack gap="2">
+                  <LegacyStack gap="2">
                     <Divider />
-                    <HorizontalStack align="space-between">
+                    <LegacyStack align="space-between">
                       <Text as="span" variant="bodyMd">
                         Framework
                       </Text>
                       <Link url="https://remix.run" target="_blank">
                         Remix
                       </Link>
-                    </HorizontalStack>
+                    </LegacyStack>
                     <Divider />
-                    <HorizontalStack align="space-between">
+                    <LegacyStack align="space-between">
                       <Text as="span" variant="bodyMd">
                         Database
                       </Text>
                       <Link url="https://www.prisma.io/" target="_blank">
                         Prisma
                       </Link>
-                    </HorizontalStack>
+                    </LegacyStack>
                     <Divider />
-                    <HorizontalStack align="space-between">
+                    <LegacyStack align="space-between">
                       <Text as="span" variant="bodyMd">
                         Interface
                       </Text>
@@ -223,9 +222,9 @@ export default function Index() {
                           App Bridge
                         </Link>
                       </span>
-                    </HorizontalStack>
+                    </LegacyStack>
                     <Divider />
-                    <HorizontalStack align="space-between">
+                    <LegacyStack align="space-between">
                       <Text as="span" variant="bodyMd">
                         API
                       </Text>
@@ -235,12 +234,12 @@ export default function Index() {
                       >
                         GraphQL API
                       </Link>
-                    </HorizontalStack>
-                  </VerticalStack>
-                </VerticalStack>
+                    </LegacyStack>
+                  </LegacyStack>
+                </LegacyStack>
               </Card>
               <Card>
-                <VerticalStack gap="2">
+                <LegacyStack gap="2">
                   <Text as="h2" variant="headingMd">
                     Next steps
                   </Text>
@@ -266,12 +265,12 @@ export default function Index() {
                       </Link>
                     </List.Item>
                   </List>
-                </VerticalStack>
+                </LegacyStack>
               </Card>
-            </VerticalStack>
+            </LegacyStack>
           </Layout.Section>
         </Layout>
-      </VerticalStack>
+      </LegacyStack>
     </Page>
   );
 }
