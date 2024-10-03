@@ -9,10 +9,16 @@ export type ErrorBannerProps = {
 };
 
 export default function ErrorBanner({ errors }: ErrorBannerProps) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    if(ref.current && errors.length > 0) {
+      ref.current.focus();
+    }
+  }, [ref, errors])
     return errors.length > 0 ? (
       <Layout.Section>
         <Banner tone="critical">
-          <p>There were some issues with your form submission:</p>
+          <p ref={ref}>There were some issues with your form submission:</p>
           <ul>
             {errors.map(({ message }, index) => {
               return (

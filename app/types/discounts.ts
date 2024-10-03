@@ -4,6 +4,14 @@ import type { Field } from "@shopify/react-form";
 export type DiscountSubmit = (form: any) => { status: 'success' | 'failed' | '' };
 export type DiscountType = "fixedAmount" | "percentage" | string;
 
+export type DiscountConfigurationInput = {
+    discountType: DiscountType,
+    "": number,
+    "Monthly": number,
+    "Bi-Monthly": number,
+    "Every Two Weeks": number
+};
+
 export type DiscountInput = {
     discountTitle: string,
     discountMethod: DiscountMethod,
@@ -20,19 +28,18 @@ export type DiscountInput = {
     appliesOncePerCustomer: boolean,
     startDate: string ,
     endDate: string | null,
-    configuration: {
-        discountType: DiscountType,
-        "": number,
-        "Monthly": number,
-        "Bi-Monthly": number,
-        "Every Two Weeks": number
-    },
+    configuration: DiscountConfigurationInput,
+    
 };
 
-export type DiscountFields = {
-    [key in keyof Omit<DiscountInput, 'configuration'>]: Field<DiscountInput[key]>;
-} & {
-    configuration: {
-        [key in keyof DiscountInput['configuration']]: Field<DiscountInput['configuration'][key]>
-    }
+export type AsField<T, O extends keyof T | void > = O extends keyof T ? {
+  [key in keyof Omit<T, O>]: Field<T[key]>
+} : {
+    [key in keyof T]: Field<T[key]>
+}
+
+
+export type DiscountConfigurationFields = AsField<DiscountConfigurationInput, void>
+export type DiscountFields = AsField<DiscountInput, "configuration"> & {
+    configuration: DiscountConfigurationFields
 }

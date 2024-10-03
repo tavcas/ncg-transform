@@ -3,7 +3,7 @@
 client_id = "952fc59953bdc2206b9ead351b810388"
 name = "ncg-transform-dev"
 handle = "ncg-transform-dev"
-application_url = "https://how-feels-suggested-evaluation.trycloudflare.com"
+application_url = "https://comply-male-doc-win.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_products,write_cart_transforms,write_discounts,write_discounts_al
 
 [auth]
 redirect_urls = [
-  "https://how-feels-suggested-evaluation.trycloudflare.com/auth/callback",
-  "https://how-feels-suggested-evaluation.trycloudflare.com/auth/shopify/callback",
-  "https://how-feels-suggested-evaluation.trycloudflare.com/api/auth/callback"
+  "https://comply-male-doc-win.trycloudflare.com/auth/callback",
+  "https://comply-male-doc-win.trycloudflare.com/auth/shopify/callback",
+  "https://comply-male-doc-win.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

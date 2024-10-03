@@ -1,6 +1,6 @@
 // @ts-ignore
 // [START build-the-ui.create-the-ui]
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { json } from "@remix-run/node";
 import { useForm, useField } from "@shopify/react-form";
 import {CurrencyCode} from '@shopify/react-i18n';
@@ -36,17 +36,12 @@ import {
   Icon,
   Button
 } from "@shopify/polaris";
-
-import {
-  ArrowLeftIcon
-} from '@shopify/polaris-icons';
-
-import { authenticate } from "../shopify.server.js";
 import { useDiscountFormSubmit, useNow, useDiscountForm } from "../hooks/index.js";
 import React from "react";
 import saveOrderDiscount from "../actions/saveOrderDiscount.js";
 import ErrorBanner from "../components/ErrorBanner.js";
 import { TitleBar } from "@shopify/app-bridge-react";
+import DiscountConfiguration from "../components/DiscountConfiguration.js";
 
 const returnToDiscounts = () => open("shopify://admin/discounts", "_top");
 
@@ -54,7 +49,7 @@ export async function action(context) {
   return saveOrderDiscount(context);
 }
 
-export default function OrderDiscountCode() {
+export default function OrderDiscountNew() {
   const navigation = useNavigation();
   const data = useActionData();
   const isLoading = navigation.state === "submitting";
@@ -82,8 +77,10 @@ export default function OrderDiscountCode() {
       } = useDiscountForm(discountSubmit, now);
 
       const errors = submitErrors.concat(data?.errors ?? []);
+
   return (
-    <Page>
+    <Page  >
+      <input type="hidden" />
       <TitleBar title="Create order discount by payment plan">
       {/* <button variant="base" onClick={returnToDiscounts}>
         Discard
@@ -104,35 +101,7 @@ export default function OrderDiscountCode() {
                 discountCode={discountCode}
                 discountMethod={discountMethod}
               />
-              <Box paddingBlockEnd="300">
-                <Card>
-                  <BlockStack gap={300}>
-                  <Text variant="headingMd" as="h3">
-                      Value Type
-                    </Text>
-                    <Select
-                    label=""
-                    options={[
-                        { label: 'Fixed amount', value: 'fixedAmount'},
-                        { label: 'Percentage', value: 'percentage'},
-                    ]}
-                    {...configuration.discountType}
-                     />
-                     <Text variant="headingMd" as="h3">
-                      Value by payment plan
-                    </Text>
-                    {Object.entries(configuration).filter(k => k[0] !== 'discountType').map(([k, f]) => (
-                       <TextField
-                       key={k}
-                       label={k || "None"}
-                       autoComplete="on"
-                       {...f}
-                       suffix={configuration.discountType.value === "percentage" ? "%" : ""}
-                     />
-                    ))}
-                  </BlockStack>
-                </Card>
-              </Box>
+              <DiscountConfiguration {...configuration} />
               {/* [START build-the-ui.other-components] */}
               {discountMethod.value === DiscountMethod.Code && (
                 <UsageLimitsCard
