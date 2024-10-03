@@ -32,22 +32,35 @@ import {
   Box,
   Select,
   LegacyStack,
-  BlockStack
+  BlockStack,
+  Icon,
+  Button
 } from "@shopify/polaris";
+
+import {
+  ArrowLeftIcon
+} from '@shopify/polaris-icons';
 
 import { authenticate } from "../shopify.server.js";
 import { useDiscountFormSubmit, useNow, useDiscountForm } from "../hooks/index.js";
 import React from "react";
+import saveOrderDiscount from "../actions/saveOrderDiscount.js";
+import ErrorBanner from "../components/ErrorBanner.js";
+import { TitleBar } from "@shopify/app-bridge-react";
 
 const returnToDiscounts = () => open("shopify://admin/discounts", "_top");
 
+export async function action(context) {
+  return saveOrderDiscount(context);
+}
+
 export default function OrderDiscountCode() {
   const navigation = useNavigation();
-
+  const data = useActionData();
   const isLoading = navigation.state === "submitting";
   const currencyCode = CurrencyCode.Usd;
     const now = useNow();
-    const discountSubmit = useDiscountFormSubmit();
+    const [discountSubmit, submitErrors] = useDiscountFormSubmit();
     const {
         fields: {
           discountTitle,
@@ -67,18 +80,20 @@ export default function OrderDiscountCode() {
         },
         submit,
       } = useDiscountForm(discountSubmit, now);
+
+      const errors = submitErrors.concat(data?.errors ?? []);
   return (
     <Page>
-      <ui-title-bar title="Create order discount by payment plan">
-        <button variant="breadcrumb" onClick={returnToDiscounts}>
-          Discounts
+      <TitleBar title="Create order discount by payment plan">
+      {/* <button variant="base" onClick={returnToDiscounts}>
+        Discard
         </button>
         <button variant="primary" onClick={submit}>
           Save discount
-        </button>
-      </ui-title-bar>
+        </button> */}
+      </TitleBar>
       <Layout>
-        {/**TODO: Add error banner */}
+      <ErrorBanner errors={errors} />
         <Layout.Section>
             <Form method="post">
             <BlockStack align="space-around" gap="200">
@@ -127,8 +142,8 @@ export default function OrderDiscountCode() {
               )}
               <CombinationCard
                 combinableDiscountTypes={combinesWith}
-                discountClass={DiscountClass.Product}
-                discountDescriptor={"Discount"}
+                discountClass={DiscountClass.Order}
+                discountDescriptor={discountMethod.value === DiscountMethod.Automatic ? discountTitle.value : discountCode.value}
               />
               <ActiveDatesCard
                 startDate={startDate}
@@ -147,7 +162,7 @@ export default function OrderDiscountCode() {
                 discountMethod.value === DiscountMethod.Automatic
                   ? discountTitle.value
                   : discountCode.value,
-              appDiscountType: "Volume",
+              appDiscountType: "Amount off Order By Payment Plan",
               isEditing: false,
             }}
             performance={{
@@ -171,6 +186,21 @@ export default function OrderDiscountCode() {
             }}
           />
           {/* [END build-the-ui.summary-card] */}
+        </Layout.Section>
+        <Layout.Section>
+          <PageActions
+            primaryAction={{
+              content: "Save discount",
+              onAction: submit,
+              loading: isLoading,
+            }}
+            secondaryActions={[
+              {
+                content: "Discard",
+                onAction: returnToDiscounts,
+              },
+            ]}
+          />
         </Layout.Section>
       </Layout>
     </Page>

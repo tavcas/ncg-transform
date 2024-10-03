@@ -1,7 +1,7 @@
 import { Layout, Banner } from "@shopify/polaris";
 import React from "react";
 
-type ErrorBannerProps = {
+export type ErrorBannerProps = {
     errors: {
         field: string[]
         message: string
@@ -11,13 +11,13 @@ type ErrorBannerProps = {
 export default function ErrorBanner({ errors }: ErrorBannerProps) {
     return errors.length > 0 ? (
       <Layout.Section>
-        <Banner status="critical">
+        <Banner tone="critical">
           <p>There were some issues with your form submission:</p>
           <ul>
-            {errors.map(({ message, field }, index) => {
+            {errors.map(({ message }, index) => {
               return (
                 <li key={`${message}${index}`}>
-                  {field.join(".")} {message}
+                  {message}
                 </li>
               );
             })}

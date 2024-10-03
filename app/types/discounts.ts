@@ -18,8 +18,8 @@ export type DiscountInput = {
     requirementQuantity: string,
     usageLimit: string | null,
     appliesOncePerCustomer: boolean,
-    startDate: Date ,
-    endDate: Date | null,
+    startDate: string ,
+    endDate: string | null,
     configuration: {
         discountType: DiscountType,
         "": number,

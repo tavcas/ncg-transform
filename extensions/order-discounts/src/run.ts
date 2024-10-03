@@ -18,11 +18,13 @@ export const EMPTY_DISCOUNT: FunctionRunResult = {
   discounts: [],
 };
 
+
+
 export type DiscountValue = {
-  type: "fixedAmount" | "percentage";
-  half: number;
-  full: number;
-}
+  discountType: "fixedAmount" | "percentage";
+} & {
+  [key in PaymentPlan]: number;
+};
 
 function strToPaymentPlan(convertingStr: string): PaymentPlan {
   if (Object.values(PaymentPlan).includes(convertingStr as PaymentPlan)) {
@@ -34,11 +36,14 @@ function strToPaymentPlan(convertingStr: string): PaymentPlan {
 
 function customDiscountValues(discount: RunInput["discount"], plan: PaymentPlan): FunctionRunResult["discounts"][0]["value"] | undefined {
   try {
-    const { full, half, type } = JSON.parse(discount.configuration?.value ?? "") as DiscountValue
-    var value = [PaymentPlan.Monthly, PaymentPlan.None].includes(plan) ? full: half
-    return type === "fixedAmount"
+    const { discountType, ...values} = JSON.parse(discount.configuration?.value ?? "") as DiscountValue
+    var value = values[plan] ?? 0;
+    console.log({discountType, values});
+    const result = discountType === "fixedAmount"
     ? { fixedAmount: {amount: value}}
     : { percentage: { value } };
+    console.log(result);
+    return result;
   } catch(error) {
     console.log(JSON.stringify(error));
   }
@@ -49,7 +54,7 @@ export function run(input: RunInput): FunctionRunResult {
     console.log(JSON.stringify(input));
     const plan = strToPaymentPlan(input.cart.plan?.value ?? "");
     const value = customDiscountValues(input.discount, plan);
-    if (!value) {
+    if (!value || !(value.fixedAmount || value.percentage)) {
       return EMPTY_DISCOUNT;
     }
 

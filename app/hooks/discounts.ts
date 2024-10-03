@@ -1,10 +1,11 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useSubmit } from "@remix-run/react";
 import { DiscountMethod, RequirementType } from "@shopify/discount-app-components";
 import { useForm, useField } from "@shopify/react-form";
 import type { DiscountFields, DiscountInput, DiscountSubmit } from "../types";
+import type { ErrorBannerProps } from "../components/ErrorBanner";
 
-
+type errors = ErrorBannerProps["errors"]
 export const useDiscountForm = (onSubmit: DiscountSubmit, startDate: Date) => useForm<DiscountFields>({
     onSubmit: (fields: any) => {
         onSubmit(fields);
@@ -24,7 +25,7 @@ export const useDiscountForm = (onSubmit: DiscountSubmit, startDate: Date) => us
         requirementQuantity: useField("0"),
         usageLimit: useField(null),
         appliesOncePerCustomer: useField(false),
-        startDate: useField(startDate),
+        startDate: useField(startDate.toISOString()),
         endDate: useField(null),
         // [START build-the-ui.add-configuration]
         configuration: {
@@ -38,9 +39,23 @@ export const useDiscountForm = (onSubmit: DiscountSubmit, startDate: Date) => us
       },
 })
 
-export const useDiscountFormSubmit = () => {
+export type DiscountSubmitCallback = (form: DiscountInput) => {
+  status: string;
+  errors: {
+      field: string[];
+      message: string;
+  }[];
+} | {
+  status: string;
+  errors?: undefined;
+};
+
+export const useDiscountFormSubmit: [DiscountSubmitCallback, errors] = () => {
     const submitForm = useSubmit();
-    return useCallback((form: DiscountInput) => {
+    const [submitErrors, setSubmitErrors] = useState<errors>([]);
+    const submit: DiscountSubmitCallback = useCallback((form: DiscountInput) => {
+        setSubmitErrors([]);
+        const errors: errors = [];
         const discount = {
           title: form.discountTitle,
           method: form.discountMethod,
@@ -58,9 +73,20 @@ export const useDiscountFormSubmit = () => {
               "Every Two Weeks": form.configuration["Every Two Weeks"],
             },
         };
+
+        if(Object.entries(discount.configuration).filter(([k, v]) => k !== "discountType" && Number(v) > 0).length === 0) {
+          errors.push({ field: ["configuration"], message: "Please submit a value for at least one Payment Plan"});
+        }
     
+        if(errors.length > 0) {
+          setSubmitErrors(errors);
+          return { status: 'error', errors }
+        }
+
         submitForm({ discount: JSON.stringify(discount) }, { method: "post" });
-    
         return { status: "success" };
+
       },[submitForm]);
+
+      return [submit, submitErrors];
 }
