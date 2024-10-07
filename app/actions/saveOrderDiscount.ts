@@ -2,6 +2,7 @@ import { json } from "@remix-run/node";
 import { DiscountMethod } from "@shopify/discount-app-components";
 import shopify from "../shopify.server";
 
+
 export default async function saveOrderDiscount({ params, request }){
     const { functionId } = params;
     const { admin } = await shopify.authenticate.admin(request);

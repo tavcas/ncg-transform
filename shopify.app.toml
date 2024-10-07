@@ -3,11 +3,11 @@
 client_id = "ccd6dca5cef9a6768abf3f13bf48e944"
 name = "ncg-transform-dev"
 handle = "ncg-transform-dev"
-application_url = "https://biological-seas-cancelled-graphs.trycloudflare.com/"
+application_url = "https://ncg-transform-dev-874ed72e91b8.herokuapp.com"
 embedded = true
 
 [build]
-automatically_update_urls_on_dev = true
+automatically_update_urls_on_dev = false
 dev_store_url = "ncg-test-environment.myshopify.com"
 
 [access_scopes]
@@ -16,9 +16,9 @@ scopes = "write_products, write_discounts, write_discounts_allocator_functions, 
 
 [auth]
 redirect_urls = [
-  "https://biological-seas-cancelled-graphs.trycloudflare.com/auth/callback",
-  "https://biological-seas-cancelled-graphs.trycloudflare.com/auth/shopify/callback",
-  "https://biological-seas-cancelled-graphs.trycloudflare.com/api/auth/callback"
+  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/auth/callback",
+  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/auth/shopify/callback",
+  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/api/auth/callback"
 ]
 
 [webhooks]

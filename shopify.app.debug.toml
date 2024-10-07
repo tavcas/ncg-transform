@@ -3,11 +3,11 @@
 client_id = "952fc59953bdc2206b9ead351b810388"
 name = "ncg-transform-dev"
 handle = "ncg-transform-dev"
-application_url = "https://ncg-transform-dev-874ed72e91b8.herokuapp.com"
+application_url = "https://designed-coming-loans-bo.trycloudflare.com"
 embedded = true
 
 [build]
-automatically_update_urls_on_dev = false
+automatically_update_urls_on_dev = true
 dev_store_url = "dekstech-dev.myshopify.com"
 include_config_on_deploy = true
 
@@ -17,9 +17,9 @@ scopes = "read_products,write_cart_transforms,write_discounts,write_discounts_al
 
 [auth]
 redirect_urls = [
-  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/auth/callback",
-  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/auth/shopify/callback",
-  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/api/auth/callback"
+  "https://designed-coming-loans-bo.trycloudflare.com/auth/callback",
+  "https://designed-coming-loans-bo.trycloudflare.com/auth/shopify/callback",
+  "https://designed-coming-loans-bo.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
