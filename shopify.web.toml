@@ -1,7 +1,7 @@
 name = "remix"
 roles = ["frontend", "backend"]
 webhooks_path = "/webhooks"
-port = 9000
+port = 9100
 [commands]
 dev = "npm exec remix dev"
 

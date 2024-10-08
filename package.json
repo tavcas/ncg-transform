@@ -2,7 +2,7 @@
   "name": "ncg-transform",
   "private": true,
   "scripts": {
-    "ngrok": "ngrok http --domain=personally-positive-sheep.ngrok-free.app 9000",
+    "ngrok": "ngrok http --domain=personally-positive-sheep.ngrok-free.app 9100",
     "build": "NODE_ENV=production remix build",
     "predev": "prisma generate && prisma migrate deploy",
     "dev": "env-cmd shopify app dev",
@@ -37,7 +37,6 @@
     "@shopify/shopify-app-session-storage-prisma": "^1.0.0",
     "cross-env": "^7.0.3",
     "isbot": "latest",
-    "migrations": "^1.5.0",
     "prisma": "^4.13.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -51,6 +50,9 @@
     "eslint-config-prettier": "^8.8.0",
     "prettier": "^2.8.8"
   },
+  "trustedDependencies": [
+    "@shopify/plugin-cloudflare"
+  ],
   "workspaces": [
     "web",
     "web/frontend",

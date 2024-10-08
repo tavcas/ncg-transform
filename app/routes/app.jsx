@@ -19,11 +19,12 @@ export async function loader({ request }) {
   return json({
     polarisTranslations: require("@shopify/polaris/locales/en.json"),
     apiKey: process.env.SHOPIFY_API_KEY,
+    orderDiscountId: process.env.SHOPIFY_ORDER_DISCOUNTS_ID
   });
 }
 
 export default function App() {
-  const { apiKey, polarisTranslations } = useLoaderData();
+  const { apiKey, polarisTranslations, orderDiscountId } = useLoaderData();
 
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>
@@ -37,7 +38,7 @@ export default function App() {
         <Link to="/app" rel="home">
           Home
         </Link>
-        <Link to="/app/additional">Additional page</Link>
+        <Link to={`/app/discounts/order/${orderDiscountId}/new`}>Create order discount</Link>
       </ui-nav-menu>
       <PolarisAppProvider
         i18n={polarisTranslations}
