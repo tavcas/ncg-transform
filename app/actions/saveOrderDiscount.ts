@@ -1,10 +1,64 @@
 import { json } from "@remix-run/node";
+import type { DataFunctionArgs } from "@remix-run/node";
 import { DiscountMethod } from "@shopify/discount-app-components";
 import shopify from "../shopify.server";
+import { NEW_ID } from "../constants";
 
+const CODE_DISCOUNT_UPDATE = `#graphql
+            mutation UpdateCodeDiscount($discount: DiscountCodeAppInput!, $id: ID!) {
+              discount: discountCodeAppUpdate(codeAppDiscount: $discount, id: $id) {
+                codeAppDiscount{
+                  discountId
+                }
+                userErrors {
+                  code
+                  message
+                  field
+                }
+              }
+            }`;
+const AUTOMATIC_DISCOUNT_UPDATE = `#graphql
+            mutation UpdateAutomaticDiscount($discount: DiscountAutomaticAppInput!, $id: ID!) {
+              discount: discountAutomaticAppUpdate(automaticAppDiscount: $discount, id: $id) {
+                automaticAppDiscount {
+                  discountId
+                }
+                userErrors {
+                  code
+                  message
+                  field
+                }
+              }
+            }`;
 
-export default async function saveOrderDiscount({ params, request }){
-    const { functionId } = params;
+const CODE_DISCOUNT_CREATE = `#graphql
+            mutation CreateCodeDiscount($discount: DiscountCodeAppInput!) {
+              discount: discountCodeAppCreate(codeAppDiscount: $discount) {
+                codeAppDiscount{
+                  discountId
+                }
+                userErrors {
+                  code
+                  message
+                  field
+                }
+              }
+            }`;
+const AUTOMATIC_DISCOUNT_CREATE = `#graphql
+            mutation CreateAutomaticDiscount($discount: DiscountAutomaticAppInput!) {
+              discount: discountAutomaticAppCreate(automaticAppDiscount: $discount) {
+                automaticAppDiscount {
+                  discountId
+                }
+                userErrors {
+                  code
+                  message
+                  field
+                }
+              }
+            }`;
+export default async function saveOrderDiscount({ params, request }: DataFunctionArgs){
+    const { functionId, id } = params;
     const { admin } = await shopify.authenticate.admin(request);
     const formData = await request.formData();
     const {
@@ -17,14 +71,14 @@ export default async function saveOrderDiscount({ params, request }){
       startsAt,
       endsAt,
       configuration,
-    } = JSON.parse(formData.get("discount"));
+    } = JSON.parse(formData.get("discount")?.toString() ?? "");
   
     const baseDiscount = {
-      functionId,
       title,
+      functionId,
       combinesWith,
       startsAt: new Date(startsAt),
-      endsAt: endsAt && new Date(endsAt),
+      endsAt: endsAt ? new Date(endsAt) : null,
     };
   
     const metafields = [
@@ -41,66 +95,58 @@ export default async function saveOrderDiscount({ params, request }){
         ...baseDiscount,
         title: code,
         code,
-        usageLimit,
+        usageLimit: usageLimit > 0 ? usageLimit : null,
         appliesOncePerCustomer,
       };
-  
-      const response = await admin.graphql(
-        `#graphql
-            mutation CreateCodeDiscount($discount: DiscountCodeAppInput!) {
-              discountCreate: discountCodeAppCreate(codeAppDiscount: $discount) {
-                codeAppDiscount{
-                  discountId
-                }
-                userErrors {
-                  code
-                  message
-                  field
-                }
-              }
-            }`,
-        {
-          variables: {
-            discount: {
-              ...baseCodeDiscount,
-              metafields,
-            },
+
+      const input: Parameters<typeof admin.graphql> = (id === NEW_ID ? [CODE_DISCOUNT_CREATE, {
+        variables: {
+          discount: {
+            ...baseCodeDiscount,
+            metafields,
           },
         },
-      );
+      }]
+    : [CODE_DISCOUNT_UPDATE, {
+      variables: {
+        discount: {
+          ...baseCodeDiscount,
+          metafields,
+        },
+        id
+      },
+    }]);
+  
+      const response = await admin.graphql(...input);
   
       const responseJson = await response.json();
   
-      const errors = responseJson.data.discountCreate?.userErrors;
-      const discount = responseJson.data.discountCreate?.codeAppDiscount;
-      return json({ errors, discount: { ...discount, functionId } });
+      const errors = responseJson.data.discount?.userErrors;
+      const discount = responseJson.data.discount?.codeAppDiscount;
+      return json({ errors, discount: { ...baseCodeDiscount, ...discount, functionId, metafields } });
     } else {
-      const response = await admin.graphql(
-        `#graphql
-            mutation CreateAutomaticDiscount($discount: DiscountAutomaticAppInput!) {
-              discountCreate: discountAutomaticAppCreate(automaticAppDiscount: $discount) {
-                automaticAppDiscount {
-                  discountId
-                }
-                userErrors {
-                  code
-                  message
-                  field
-                }
-              }
-            }`,
-        {
-          variables: {
-            discount: {
-              ...baseDiscount,
-              metafields,
-            },
+      const input: Parameters<typeof admin.graphql> = (id === NEW_ID ? [AUTOMATIC_DISCOUNT_CREATE, {
+        variables: {
+          discount: {
+            ...baseDiscount,
+            metafields,
           },
         },
-      );
+      }]
+    : [AUTOMATIC_DISCOUNT_UPDATE, {
+      variables: {
+        discount: {
+          ...baseDiscount,
+          metafields,
+        },
+        id
+      },
+    }]);
   
+      const response = await admin.graphql(...input);
       const responseJson = await response.json();
-      const errors = responseJson.data.discountCreate?.userErrors;
-      return json({ errors });
+      const errors = responseJson.data.discount?.userErrors;
+      const discount = responseJson.data.discount?.automaticAppDiscount;
+      return json({ errors, discount: { ...baseDiscount, ...discount, functionId, metafields } });
     }
   };

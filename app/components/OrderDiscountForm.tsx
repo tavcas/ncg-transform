@@ -1,96 +1,43 @@
-// @ts-ignore
-// [START build-the-ui.create-the-ui]
-import { useEffect, useMemo, useRef, useState } from "react";
-import { json } from "@remix-run/node";
-import { useForm, useField } from "@shopify/react-form";
-import {CurrencyCode} from '@shopify/react-i18n';
-import {
-  Form,
-  useActionData,
-  useNavigation,
-  useSubmit,
-} from "@remix-run/react";
-import {
-  ActiveDatesCard,
-  CombinationCard,
-  DiscountClass,
-  DiscountMethod,
-  MethodCard,
-  DiscountStatus,
-  RequirementType,
-  SummaryCard,
-  UsageLimitsCard,
-} from "@shopify/discount-app-components";
-import {
-  Banner,
-  Card,
-  Text,
-  Layout,
-  Page,
-  PageActions,
-  TextField,
-  Box,
-  Select,
-  LegacyStack,
-  BlockStack,
-  Icon,
-  Button
-} from "@shopify/polaris";
-import { useDiscountFormSubmit, useNow, useDiscountForm } from "../hooks/index.js";
-import React from "react";
-import saveOrderDiscount from "../actions/saveOrderDiscount.js";
-import ErrorBanner from "../components/ErrorBanner.js";
-import { TitleBar } from "@shopify/app-bridge-react";
-import DiscountConfiguration from "../components/DiscountConfiguration.js";
+import type { Form  as FormType} from "@shopify/react-form";
+import type { DiscountFields } from "../types";
+import { Form } from "@remix-run/react";
+import { MethodCard, DiscountClass, DiscountMethod, UsageLimitsCard, CombinationCard, ActiveDatesCard, SummaryCard, DiscountStatus } from "@shopify/discount-app-components";
+import { Layout, BlockStack, PageActions } from "@shopify/polaris";
+import DiscountConfiguration from "./DiscountConfiguration";
+import type { ErrorBannerProps } from "./ErrorBanner";
+import ErrorBanner from "./ErrorBanner";
+import { DEFAULT_CURRENCY } from "../constants";
 
-const returnToDiscounts = () => open("shopify://admin/discounts", "_top");
+type OrderDiscountFormProps = FormType<DiscountFields> & ErrorBannerProps & {
+    isLoading: boolean;
+    onDiscard: () => void
+};
 
-export async function action(context) {
-  return saveOrderDiscount(context);
-}
-
-export default function OrderDiscountNew() {
-  const navigation = useNavigation();
-  const data = useActionData();
-  const isLoading = navigation.state === "submitting";
-  const currencyCode = CurrencyCode.Usd;
-    const now = useNow();
-    const [discountSubmit, submitErrors] = useDiscountFormSubmit();
-    const {
-        fields: {
-          discountTitle,
-          discountCode,
-          discountMethod,
-          combinesWith,
-          requirementType,
-          requirementSubtotal,
-          requirementQuantity,
-          usageLimit,
-          appliesOncePerCustomer,
-          startDate,
-          endDate,
-          // [START build-the-ui.add-configuration]
-          configuration,
-          // [END build-the-ui.add-configuration]
-        },
-        submit,
-      } = useDiscountForm(discountSubmit, now);
-
-      const errors = submitErrors.concat(data?.errors ?? []);
-
-  return (
-    <Page  >
-      <input type="hidden" />
-      <TitleBar title="Create order discount by payment plan">
-      {/* <button variant="base" onClick={returnToDiscounts}>
-        Discard
-        </button>
-        <button variant="primary" onClick={submit}>
-          Save discount
-        </button> */}
-      </TitleBar>
-      <Layout>
-      <ErrorBanner errors={errors} />
+export default function OrderDiscountForm({
+    fields: {
+      discountTitle,
+      discountCode,
+      discountMethod,
+      combinesWith,
+      requirementType,
+      requirementSubtotal,
+      requirementQuantity,
+      usageLimit,
+      appliesOncePerCustomer,
+      startDate,
+      endDate,
+      // [START build-the-ui.add-configuration]
+      configuration,
+      // [END build-the-ui.add-configuration]
+    },
+    submit,
+    errors,
+    isLoading,
+    onDiscard
+  }: OrderDiscountFormProps) {
+    const currencyCode = DEFAULT_CURRENCY;
+    return (<Layout>
+    <ErrorBanner errors={errors} />
         <Layout.Section>
             <Form method="post">
             <BlockStack align="space-around" gap="200">
@@ -166,13 +113,10 @@ export default function OrderDiscountNew() {
             secondaryActions={[
               {
                 content: "Discard",
-                onAction: returnToDiscounts,
+                onAction: onDiscard,
               },
             ]}
           />
         </Layout.Section>
-      </Layout>
-    </Page>
-  );
+      </Layout>);
 }
-

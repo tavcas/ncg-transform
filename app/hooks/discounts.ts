@@ -1,59 +1,47 @@
 import { useCallback, useState } from "react";
 import { useSubmit } from "@remix-run/react";
-import { DiscountMethod, RequirementType } from "@shopify/discount-app-components";
 import { useForm, useField } from "@shopify/react-form";
 import type { DiscountFields, DiscountInput, DiscountSubmit } from "../types";
 import type { ErrorBannerProps } from "../components/ErrorBanner";
+import { DiscountMethod, DiscountStatus, RequirementType } from "@shopify/discount-app-components";
 
 type errors = ErrorBannerProps["errors"]
-export const useDiscountForm = (onSubmit: DiscountSubmit, startDate: Date) => useForm<DiscountFields>({
+export const useDiscountForm = (onSubmit: DiscountSubmit, initial: Partial<DiscountInput>) => useForm<DiscountFields>({
     onSubmit: (fields: any) => {
         onSubmit(fields);
         return fields;
     },
     fields: {
-        discountTitle: useField(""),
-        discountMethod: useField(DiscountMethod.Code),
-        discountCode: useField(""),
-        combinesWith: useField({
-          orderDiscounts: false,
-          productDiscounts: false,
-          shippingDiscounts: false,
-        }),
-        requirementType: useField(RequirementType.None),
-        requirementSubtotal: useField("0"),
-        requirementQuantity: useField("0"),
-        usageLimit: useField(null),
-        appliesOncePerCustomer: useField(false),
-        startDate: useField(startDate.toISOString()),
-        endDate: useField(null),
+        discountTitle: useField(initial.discountTitle ?? ""),
+        discountMethod: useField(initial.discountMethod ?? DiscountMethod.Code),
+        discountCode: useField(initial.discountCode ?? ""),
+        combinesWith: useField(initial.combinesWith ?? { productDiscounts: false, orderDiscounts: false, shippingDiscounts: false}),
+        requirementType: useField(initial.requirementType ?? RequirementType.None),
+        requirementSubtotal: useField(initial.requirementSubtotal ?? "0"),
+        requirementQuantity: useField(initial.requirementQuantity ?? "0"),
+        usageLimit: useField(initial.usageLimit ?? "0"),
+        appliesOncePerCustomer: useField(initial.appliesOncePerCustomer ?? false),
+        startDate: useField(initial.startDate ?? new Date().toISOString()),
+        endDate: useField(initial.endDate ?? ""),
+        status: useField(initial.status ?? DiscountStatus.Scheduled),
+        usageCount: useField(initial.usageCount ?? null),
         // [START build-the-ui.add-configuration]
         configuration: {
-          discountType: useField("fixedAmount"),
-          "": useField(0),
-          "Monthly": useField(0),
-          "Bi-Monthly": useField(0),
-          "Every Two Weeks": useField(0)
+          discountType: useField(initial.configuration?.discountType ?? "fixedAmount"),
+          "": useField(initial.configuration?.[""] ?? 0),
+          "Monthly": useField(initial.configuration?.["Monthly"] ?? 0),
+          "Bi-Monthly": useField(initial.configuration?.["Bi-Monthly"] ?? 0),
+          "Every Two Weeks": useField(initial.configuration?.["Every Two Weeks"] ?? 0)
         },
         // [END build-the-ui.add-configuration]
       },
 })
 
-export type DiscountSubmitCallback = (form: DiscountInput) => {
-  status: string;
-  errors: {
-      field: string[];
-      message: string;
-  }[];
-} | {
-  status: string;
-  errors?: undefined;
-};
 
-export const useDiscountFormSubmit: [DiscountSubmitCallback, errors] = () => {
+export const useDiscountFormSubmit = (): [DiscountSubmit, errors] => {
     const submitForm = useSubmit();
     const [submitErrors, setSubmitErrors] = useState<errors>([]);
-    const submit: DiscountSubmitCallback = useCallback((form: DiscountInput) => {
+    const submit: DiscountSubmit = useCallback((form: DiscountInput) => {
         setSubmitErrors([]);
         const errors: errors = [];
         const discount = {
@@ -61,7 +49,7 @@ export const useDiscountFormSubmit: [DiscountSubmitCallback, errors] = () => {
           method: form.discountMethod,
           code: form.discountCode,
           combinesWith: form.combinesWith,
-          usageLimit: form.usageLimit == null ? null : Number(form.usageLimit),
+          usageLimit: form.usageLimit === null ? null : Number(form.usageLimit),
           appliesOncePerCustomer: form.appliesOncePerCustomer,
           startsAt: form.startDate,
           endsAt: form.endDate,
@@ -88,5 +76,5 @@ export const useDiscountFormSubmit: [DiscountSubmitCallback, errors] = () => {
 
       },[submitForm]);
 
-      return [submit, submitErrors];
+      return [submit, submitErrors] satisfies [DiscountSubmit, errors];
 }

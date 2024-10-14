@@ -1,7 +1,15 @@
-import type { DiscountMethod, RequirementType } from "@shopify/discount-app-components";
+import type { DiscountMethod, DiscountStatus, RequirementType } from "@shopify/discount-app-components";
 import type { Field } from "@shopify/react-form";
 
-export type DiscountSubmit = (form: any) => { status: 'success' | 'failed' | '' };
+export type DiscountSubmit = (form: DiscountInput) => {
+    status: 'success' | 'failed';
+    errors: {
+        field: string[];
+        message: string;
+    }[];
+  } | {
+    status: string;
+  };
 export type DiscountType = "fixedAmount" | "percentage" | string;
 
 export type DiscountConfigurationInput = {
@@ -29,6 +37,8 @@ export type DiscountInput = {
     startDate: string ,
     endDate: string | null,
     configuration: DiscountConfigurationInput,
+    usageCount: number | null,
+    status: DiscountStatus
     
 };
 

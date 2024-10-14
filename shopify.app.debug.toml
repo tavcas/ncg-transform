@@ -3,7 +3,7 @@
 client_id = "952fc59953bdc2206b9ead351b810388"
 name = "ncg-transform-dev"
 handle = "ncg-transform-dev"
-application_url = "https://container-avon-amateur-push.trycloudflare.com"
+application_url = "https://adrian-committees-play-reserved.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_products,write_cart_transforms,write_discounts,write_discounts_al
 
 [auth]
 redirect_urls = [
-  "https://container-avon-amateur-push.trycloudflare.com/auth/callback",
-  "https://container-avon-amateur-push.trycloudflare.com/auth/shopify/callback",
-  "https://container-avon-amateur-push.trycloudflare.com/api/auth/callback"
+  "https://adrian-committees-play-reserved.trycloudflare.com/auth/callback",
+  "https://adrian-committees-play-reserved.trycloudflare.com/auth/shopify/callback",
+  "https://adrian-committees-play-reserved.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
