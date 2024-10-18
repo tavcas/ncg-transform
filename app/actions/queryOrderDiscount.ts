@@ -2,8 +2,8 @@ import { json, Response } from "@remix-run/node";
 import type { DataFunctionArgs } from "@remix-run/node";
 import { NEW_ID } from "../constants";
 import shopify from "../shopify.server";
-import type { DiscountConfigurationInput, DiscountInput } from "../types";
-import { DiscountMethod, RequirementType } from "@shopify/discount-app-components";
+import type { DiscountConfigurationInput, DiscountInput, DiscountRequirementsInput } from "../types";
+import { DiscountMethod } from "@shopify/discount-app-components";
 
 const QUERY_DISCOUNT_ID = `#graphql
 query orderDetails($query:String) {
@@ -37,6 +37,7 @@ query orderDetails($query:String) {
                 }
             } 
             configuration: metafield(namespace: "$app:paymentplan-discount", key: "value") { value }
+            requirements: metafield(namespace: "$app:paymentplan-discount", key: "requirements") { value }
         } }
     }
 }`;
@@ -54,11 +55,14 @@ export default async function queryOrderDiscount({ params, request }: DataFuncti
             });
         }
         const foundDiscount = responseJson.data.discountNodes.edges[0].node.discount;
-        const configuration = responseJson.data.discountNodes.edges[0].node.configuration;
+        const configuration = responseJson.data.discountNodes.edges[0].node.configuration.value;
+        const requirements = responseJson.data.discountNodes.edges[0].node.requirements.value;
+
         const discount: DiscountInput = {
             discountTitle: foundDiscount.title,
             discountCode: foundDiscount.title,
             configuration: JSON.parse(configuration.value) as DiscountConfigurationInput,
+            requirements: JSON.parse(requirements) as DiscountRequirementsInput,
             startDate: foundDiscount.startAt,
             endDate: foundDiscount.endsAt,
             discountMethod: foundDiscount.code ? DiscountMethod.Code : DiscountMethod.Automatic,
@@ -66,9 +70,6 @@ export default async function queryOrderDiscount({ params, request }: DataFuncti
             status: foundDiscount.status,
             usageCount: foundDiscount.asyncUsageCount,
             usageLimit: "",
-            requirementType: RequirementType.None,
-            requirementSubtotal: "",
-            requirementQuantity: "",
             appliesOncePerCustomer: false,
             
         };

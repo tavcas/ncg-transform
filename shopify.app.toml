@@ -1,24 +1,25 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "ccd6dca5cef9a6768abf3f13bf48e944"
-name = "ncg-transform-dev"
-handle = "ncg-transform-dev"
-application_url = "https://ncg-transform-dev-874ed72e91b8.herokuapp.com"
+client_id = "6e776e5c13cd8cb0aa631f32d1bfc539"
+name = "ncg-transform"
+handle = "ncg-transform"
+application_url = "https://ncg-transform-916f30131d4e.herokuapp.com/"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = false
 dev_store_url = "ncg-test-environment.myshopify.com"
+include_config_on_deploy = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products, write_discounts, write_discounts_allocator_functions, read_products, write_cart_transforms"
+scopes = "read_products,write_cart_transforms,write_discounts,write_products"
 
 [auth]
 redirect_urls = [
-  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/auth/callback",
-  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/auth/shopify/callback",
-  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/api/auth/callback"
+  "https://ncg-transform-916f30131d4e.herokuapp.com/auth/callback",
+  "https://ncg-transform-916f30131d4e.herokuapp.com/auth/shopify/callback",
+  "https://ncg-transform-916f30131d4e.herokuapp.com/api/auth/callback"
 ]
 
 [webhooks]

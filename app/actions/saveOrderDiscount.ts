@@ -71,6 +71,7 @@ export default async function saveOrderDiscount({ params, request }: DataFunctio
       startsAt,
       endsAt,
       configuration,
+      requirements,
     } = JSON.parse(formData.get("discount")?.toString() ?? "");
   
     const baseDiscount = {
@@ -88,6 +89,12 @@ export default async function saveOrderDiscount({ params, request }: DataFunctio
         type: "json",
         value: JSON.stringify(configuration),
       },
+      {
+        namespace: "$app:payment-plan-discount",
+        key: "requirements",
+        type: "json",
+        value: JSON.stringify(requirements)
+      }
     ];
   
     if (method === DiscountMethod.Code) {

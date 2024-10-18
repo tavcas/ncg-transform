@@ -5,8 +5,9 @@ import { MethodCard, DiscountClass, DiscountMethod, UsageLimitsCard, Combination
 import { Layout, BlockStack, PageActions } from "@shopify/polaris";
 import DiscountConfiguration from "./DiscountConfiguration";
 import type { ErrorBannerProps } from "./ErrorBanner";
+import React from "react";
 import ErrorBanner from "./ErrorBanner";
-import { DEFAULT_CURRENCY } from "../constants";
+import DiscountRequirements from "./DiscountRequirements";
 
 type OrderDiscountFormProps = FormType<DiscountFields> & ErrorBannerProps & {
     isLoading: boolean;
@@ -19,23 +20,20 @@ export default function OrderDiscountForm({
       discountCode,
       discountMethod,
       combinesWith,
-      requirementType,
-      requirementSubtotal,
-      requirementQuantity,
+      requirements,
       usageLimit,
       appliesOncePerCustomer,
       startDate,
       endDate,
-      // [START build-the-ui.add-configuration]
       configuration,
-      // [END build-the-ui.add-configuration]
+      usageCount,
+      status
     },
     submit,
     errors,
     isLoading,
     onDiscard
   }: OrderDiscountFormProps) {
-    const currencyCode = DEFAULT_CURRENCY;
     return (<Layout>
     <ErrorBanner errors={errors} />
         <Layout.Section>
@@ -49,6 +47,7 @@ export default function OrderDiscountForm({
                 discountMethod={discountMethod}
               />
               <DiscountConfiguration {...configuration} />
+              <DiscountRequirements {...requirements} />
               {/* [START build-the-ui.other-components] */}
               {discountMethod.value === DiscountMethod.Code && (
                 <UsageLimitsCard
@@ -82,15 +81,15 @@ export default function OrderDiscountForm({
               isEditing: false,
             }}
             performance={{
-              status: DiscountStatus.Scheduled,
-              usageCount: 0,
+              status: status.value ?? DiscountStatus.Scheduled,
+              usageCount: usageCount.value ?? 0,
               isEditing: false,
             }}
             minimumRequirements={{
-              requirementType: requirementType.value,
-              subtotal: requirementSubtotal.value,
-              quantity: requirementQuantity.value,
-              currencyCode: currencyCode,
+              requirementType: requirements.requirementType.value,
+              subtotal: requirements.requirementSubtotal.value,
+              quantity: requirements.requirementQuantity.value,
+              currencyCode: requirements.currencyCode.value,
             }}
             usageLimits={{
               oncePerCustomer: appliesOncePerCustomer.value,
