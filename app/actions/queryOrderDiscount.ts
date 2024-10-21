@@ -61,7 +61,7 @@ export default async function queryOrderDiscount({ params, request }: DataFuncti
         const discount: DiscountInput = {
             discountTitle: foundDiscount.title,
             discountCode: foundDiscount.title,
-            configuration: JSON.parse(configuration.value) as DiscountConfigurationInput,
+            configuration: JSON.parse(configuration) as DiscountConfigurationInput,
             requirements: JSON.parse(requirements) as DiscountRequirementsInput,
             startDate: foundDiscount.startAt,
             endDate: foundDiscount.endsAt,
@@ -73,7 +73,7 @@ export default async function queryOrderDiscount({ params, request }: DataFuncti
             appliesOncePerCustomer: false,
             
         };
-        return json({ functionId, discount});
+        return json({ functionId, discount });
     }
     return json({ functionId, discount: {} });
 }

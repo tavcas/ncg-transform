@@ -4,6 +4,7 @@ import { useForm, useField } from "@shopify/react-form";
 import type { DiscountFields, DiscountInput, DiscountSubmit } from "../types";
 import type { ErrorBannerProps } from "../components/ErrorBanner";
 import { DiscountMethod, DiscountStatus, RequirementType } from "@shopify/discount-app-components";
+import {CurrencyCode} from '@shopify/react-i18n';
 
 type errors = ErrorBannerProps["errors"]
 export const useDiscountForm = (onSubmit: DiscountSubmit, initial: Partial<DiscountInput>) => useForm<DiscountFields>({
@@ -16,9 +17,7 @@ export const useDiscountForm = (onSubmit: DiscountSubmit, initial: Partial<Disco
         discountMethod: useField(initial.discountMethod ?? DiscountMethod.Code),
         discountCode: useField(initial.discountCode ?? ""),
         combinesWith: useField(initial.combinesWith ?? { productDiscounts: false, orderDiscounts: false, shippingDiscounts: false}),
-        requirementType: useField(initial.requirementType ?? RequirementType.None),
-        requirementSubtotal: useField(initial.requirementSubtotal ?? "0"),
-        requirementQuantity: useField(initial.requirementQuantity ?? "0"),
+        
         usageLimit: useField(initial.usageLimit ?? "0"),
         appliesOncePerCustomer: useField(initial.appliesOncePerCustomer ?? false),
         startDate: useField(initial.startDate ?? new Date().toISOString()),
@@ -32,6 +31,12 @@ export const useDiscountForm = (onSubmit: DiscountSubmit, initial: Partial<Disco
           "Monthly": useField(initial.configuration?.["Monthly"] ?? 0),
           "Bi-Monthly": useField(initial.configuration?.["Bi-Monthly"] ?? 0),
           "Every Two Weeks": useField(initial.configuration?.["Every Two Weeks"] ?? 0)
+        },
+        requirements: {
+          currencyCode: useField(initial.requirements?.currencyCode ?? CurrencyCode.Usd),
+          requirementType: useField(initial.requirements?.requirementType ?? RequirementType.None),
+          requirementQuantity: useField(initial.requirements?.requirementQuantity ?? "0"),
+          requirementSubtotal: useField(initial.requirements?.requirementSubtotal ?? "0")
         },
         // [END build-the-ui.add-configuration]
       },
@@ -60,10 +65,19 @@ export const useDiscountFormSubmit = (): [DiscountSubmit, errors] => {
               "Bi-Monthly": form.configuration["Bi-Monthly"],
               "Every Two Weeks": form.configuration["Every Two Weeks"],
             },
+          requirements: form.requirements
         };
 
         if(Object.entries(discount.configuration).filter(([k, v]) => k !== "discountType" && Number(v) > 0).length === 0) {
           errors.push({ field: ["configuration"], message: "Please submit a value for at least one Payment Plan"});
+        }
+
+        if(discount.requirements.requirementType === RequirementType.Quantity && !discount.requirements.requirementQuantity) {
+          errors.push({ field: ['requirements', 'requirementQuantity'], message: 'Must input a non zero value for quantity'});
+        }
+
+        if(discount.requirements.requirementType === RequirementType.Subtotal && !discount.requirements.requirementSubtotal) {
+          errors.push({ field: ['requirements', 'requirementSubtotal'], message: 'Must input a non zero value for subtotal'});
         }
     
         if(errors.length > 0) {

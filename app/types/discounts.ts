@@ -1,6 +1,6 @@
 import type { DiscountMethod, DiscountStatus, RequirementType } from "@shopify/discount-app-components";
 import type { Field } from "@shopify/react-form";
-import {CurrencyCode} from '@shopify/react-i18n';
+import type {CurrencyCode} from '@shopify/react-i18n';
 
 export type DiscountSubmit = (form: DiscountInput) => {
     status: 'success' | 'failed';
