@@ -83,7 +83,6 @@ export default function OrderDiscountForm({
             performance={{
               status: status.value ?? DiscountStatus.Scheduled,
               usageCount: usageCount.value ?? 0,
-              isEditing: false,
             }}
             minimumRequirements={{
               requirementType: requirements.requirementType.value,

@@ -1,8 +1,16 @@
 query RunInput {
   discount: discountNode {
-    configuration: metafield(namespace: "$app:paymentplan-discount", key: "value") { value }
+    configuration: metafield(namespace: "$app:paymentplan-discount", key: "value") { value } 
+    requirements: metafield(namespace: "app:paymentplan-discount", key: "requirements") { value }
   }
   cart {
     plan: attribute(key: "Payment Plan") { value }
+    cost {
+      subtotal: subtotalAmount { amount }
+      
+    }
+    lines {
+        quantity
+      }
   }
 }
