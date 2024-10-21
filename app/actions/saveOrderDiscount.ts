@@ -140,7 +140,7 @@ export default async function saveOrderDiscount({ params, request }: DataFunctio
           ...baseCodeDiscount,
           metafields,
         },
-        id
+        id: `gid://shopify/DiscountCodeNode/${id}`
       },
     }]);
   
@@ -171,7 +171,7 @@ export default async function saveOrderDiscount({ params, request }: DataFunctio
           ...baseDiscount,
           metafields,
         },
-        id
+        id: `gid://shopify/DiscountAutomaticNode/${id}`
       },
     }]);
   

@@ -8,13 +8,16 @@ import type { ErrorBannerProps } from "./ErrorBanner";
 import React from "react";
 import ErrorBanner from "./ErrorBanner";
 import DiscountRequirements from "./DiscountRequirements";
+import { NEW_ID } from "../constants";
 
 type OrderDiscountFormProps = FormType<DiscountFields> & ErrorBannerProps & {
     isLoading: boolean;
     onDiscard: () => void
+    id?: string
 };
 
 export default function OrderDiscountForm({
+    id,
     fields: {
       discountTitle,
       discountCode,
@@ -40,11 +43,13 @@ export default function OrderDiscountForm({
             <Form method="post">
             <BlockStack align="space-around" gap="200">
                 <MethodCard
+                discountMethodHidden={id && id !== NEW_ID ? true : false}
                 title="General"
                 discountTitle={discountTitle}
                 discountClass={DiscountClass.Order}
                 discountCode={discountCode}
                 discountMethod={discountMethod}
+                
               />
               <DiscountConfiguration {...configuration} />
               <DiscountRequirements {...requirements} />

@@ -30,7 +30,7 @@ export async function action(args: DataFunctionArgs) {
 export default function OrderDiscountApp() {
   const navigation = useNavigation();
   const result =  useActionData<{ discount?: DiscountInput, errors: ErrorBannerProps["errors"]}>();
-  const data = useLoaderData<{ discount?: DiscountInput, functionId: string, errors?: ErrorBannerProps["errors"]}>();
+  const data = useLoaderData<{ id?: string, discount?: DiscountInput, functionId: string, errors?: ErrorBannerProps["errors"]}>();
   const isLoading = navigation.state === "submitting";
   const [discountSubmit, submitErrors] = useDiscountFormSubmit();
   const form = useDiscountForm(discountSubmit, result?.discount ?? data.discount ?? {});
@@ -42,6 +42,7 @@ export default function OrderDiscountApp() {
       </TitleBar>
       <OrderDiscountForm 
       {...form} 
+      id={data.id}
       isLoading={isLoading}
       errors={errors}
       onDiscard={returnToDiscounts} />

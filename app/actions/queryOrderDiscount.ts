@@ -25,6 +25,7 @@ query orderDetails($query:String) {
                 }
                 ...on DiscountCodeApp {
                     title
+                    codeCount
                     combinesWith {
                         orderDiscounts
                         productDiscounts
@@ -65,7 +66,7 @@ export default async function queryOrderDiscount({ params, request }: DataFuncti
             requirements: JSON.parse(requirements) as DiscountRequirementsInput,
             startDate: foundDiscount.startAt,
             endDate: foundDiscount.endsAt,
-            discountMethod: foundDiscount.code ? DiscountMethod.Code : DiscountMethod.Automatic,
+            discountMethod: foundDiscount.codeCount >= 0 ? DiscountMethod.Code : DiscountMethod.Automatic,
             combinesWith: foundDiscount.combinesWith,
             status: foundDiscount.status,
             usageCount: foundDiscount.asyncUsageCount,
@@ -73,7 +74,7 @@ export default async function queryOrderDiscount({ params, request }: DataFuncti
             appliesOncePerCustomer: false,
             
         };
-        return json({ functionId, discount });
+        return json({ functionId, discount, id });
     }
-    return json({ functionId, discount: {} });
+    return json({ functionId, discount: {}, id });
 }
