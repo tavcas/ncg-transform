@@ -3,6 +3,7 @@ import type { DataFunctionArgs } from "@remix-run/node";
 import { DiscountMethod } from "@shopify/discount-app-components";
 import shopify from "../shopify.server";
 import { NEW_ID } from "../constants";
+import { redirectDocument } from "@remix-run/react";
 
 const CODE_DISCOUNT_UPDATE = `#graphql
             mutation UpdateCodeDiscount($discount: DiscountCodeAppInput!, $id: ID!) {
@@ -154,7 +155,7 @@ export default async function saveOrderDiscount({ params, request }: DataFunctio
         return json({ errors, discount: { ...baseCodeDiscount, ...discount, functionId, metafields } });
       }
 
-      return redirect(discount.appDiscountType.appBridge.detailsPath.replaceAll(":functionId", functionId).replaceAll(":id", discount.discountId.split("/").pop()))
+      return redirectDocument(discount.appDiscountType.appBridge.detailsPath.replaceAll(":functionId", functionId).replaceAll(":id", discount.discountId.split("/").pop()))
       
     } else {
       const input: Parameters<typeof admin.graphql> = (id === NEW_ID ? [AUTOMATIC_DISCOUNT_CREATE, {
@@ -182,7 +183,6 @@ export default async function saveOrderDiscount({ params, request }: DataFunctio
       if(errors.length > 0) {
         return json({ errors, discount: { ...baseDiscount, ...discount, functionId, metafields } });
       }
-
-      return redirect(discount.appDiscountType.appBridge.detailsPath.replaceAll(":functionId", functionId).replaceAll(":id", discount.discountId.split("/").pop()))
+      return redirectDocument(discount.appDiscountType.appBridge.detailsPath.replaceAll(":functionId", functionId).replaceAll(":id", discount.discountId.split("/").pop()) )
     }
   };
