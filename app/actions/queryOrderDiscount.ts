@@ -4,44 +4,7 @@ import { NEW_ID } from "../constants";
 import shopify from "../shopify.server";
 import type { DiscountConfigurationInput, DiscountInput, DiscountRequirementsInput } from "../types";
 import { DiscountMethod } from "@shopify/discount-app-components";
-
-const QUERY_DISCOUNT_ID = `#graphql
-query orderDetails($query:String) {
-    discountNodes(first: 1, query: $query) {
-        edges { node {
-            discount {
-                ...on DiscountAutomaticApp {
-                    title
-                    combinesWith {
-                        orderDiscounts
-                        productDiscounts
-                        shippingDiscounts
-                    }
-                    asyncUsageCount
-                    startsAt
-                    endsAt
-                    status
-
-                }
-                ...on DiscountCodeApp {
-                    title
-                    codeCount
-                    combinesWith {
-                        orderDiscounts
-                        productDiscounts
-                        shippingDiscounts
-                    }
-                    asyncUsageCount
-                    startsAt
-                    endsAt
-                    status
-                }
-            } 
-            configuration: metafield(namespace: "$app:paymentplan-discount", key: "value") { value }
-            requirements: metafield(namespace: "$app:paymentplan-discount", key: "requirements") { value }
-        } }
-    }
-}`;
+import { QUERY_DISCOUNT_ID } from "../graphql";
 
 
 export default async function queryOrderDiscount({ params, request }: DataFunctionArgs) { 

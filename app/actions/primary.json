@@ -1,0 +1,24 @@
+[
+  {
+    "productTitle": "Intel Platinum Gaming Desktop",
+    "rate": 318600,
+    "cashPrice": "318600",
+    "imgURL": "https://cdn.shopify.com/s/files/1/0630/7866/2189/files/destiny-pro-wh_cfd58522-41ce-4528-811e-01c3035a3036.webp?v=1722551305",
+    "URL": "/products/intel-platinum-gaming-desktop-1?variant=42946494136365",
+    "variant": 42946494136365,
+    "quantity": "1",
+    "properties": [
+      { "name": "Style", "value": "White" },
+      {
+        "name": "Configuration",
+        "value": "Intel i7-14700KF 5.6 GHz Turbo / NVIDIA RTX 4070 12GB"
+      },
+      { "name": "Memory", "value": "32GB (2 x 16GB) Kingston DDR5 5200 RGB" },
+      { "name": "Payment plan", "value": "Bi-Monthly" },
+      { "name": "_mainProduct", "value": "Yes" },
+      { "name": "_uniqueID", "value": "64576934" },
+      { "name": "_cashPrice", "value": "318600" },
+      { "name": "_Tags", "value": "" }
+    ]
+  }
+]

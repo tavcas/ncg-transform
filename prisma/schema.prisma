@@ -26,3 +26,10 @@ model ShopifyMigration {
   ts          Int
 
 }
+
+model PostProcessingLog {
+  orderId     String @id
+  ts          DateTime
+  payload     String
+  response    String
+}

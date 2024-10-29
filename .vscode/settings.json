@@ -2,5 +2,7 @@
     "dependi.npm.lockFileEnabled": false,
     "search.exclude": {
         "**/node_modules": false
-    }
+    },
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true
 }

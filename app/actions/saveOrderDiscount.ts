@@ -1,83 +1,11 @@
-import { json, redirect } from "@remix-run/node";
+import { json  } from "@remix-run/node";
 import type { DataFunctionArgs } from "@remix-run/node";
 import { DiscountMethod } from "@shopify/discount-app-components";
 import shopify from "../shopify.server";
 import { NEW_ID } from "../constants";
 import { redirectDocument } from "@remix-run/react";
+import { CODE_DISCOUNT_CREATE, CODE_DISCOUNT_UPDATE, AUTOMATIC_DISCOUNT_CREATE, AUTOMATIC_DISCOUNT_UPDATE } from "../graphql";
 
-const CODE_DISCOUNT_UPDATE = `#graphql
-            mutation UpdateCodeDiscount($discount: DiscountCodeAppInput!, $id: ID!) {
-              discount: discountCodeAppUpdate(codeAppDiscount: $discount, id: $id) {
-                codeAppDiscount{
-                  discountId
-                  appDiscountType {
-                      appBridge {
-                        detailsPath
-                      }
-                    }
-                }
-                userErrors {
-                  code
-                  message
-                  field
-                }
-              }
-            }`;
-const AUTOMATIC_DISCOUNT_UPDATE = `#graphql
-            mutation UpdateAutomaticDiscount($discount: DiscountAutomaticAppInput!, $id: ID!) {
-              discount: discountAutomaticAppUpdate(automaticAppDiscount: $discount, id: $id) {
-                automaticAppDiscount {
-                  discountId
-                  appDiscountType {
-                      appBridge {
-                        detailsPath
-                      }
-                    }
-                }
-                userErrors {
-                  code
-                  message
-                  field
-                }
-              }
-            }`;
-
-const CODE_DISCOUNT_CREATE = `#graphql
-            mutation CreateCodeDiscount($discount: DiscountCodeAppInput!) {
-              discount: discountCodeAppCreate(codeAppDiscount: $discount) {
-                codeAppDiscount{
-                  discountId
-                  appDiscountType {
-                      appBridge {
-                        detailsPath
-                      }
-                  }
-                }
-                userErrors {
-                  code
-                  message
-                  field
-                }
-              }
-            }`;
-const AUTOMATIC_DISCOUNT_CREATE = `#graphql
-            mutation CreateAutomaticDiscount($discount: DiscountAutomaticAppInput!) {
-              discount: discountAutomaticAppCreate(automaticAppDiscount: $discount) {
-                automaticAppDiscount {
-                  discountId
-                  appDiscountType {
-                      appBridge {
-                        detailsPath
-                      }
-                  }
-                }
-                userErrors {
-                  code
-                  message
-                  field
-                }
-              }
-            }`;
 export default async function saveOrderDiscount({ params, request }: DataFunctionArgs){
     const { functionId, id } = params;
     const { admin } = await shopify.authenticate.admin(request);
