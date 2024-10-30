@@ -1,6 +1,6 @@
 import type { DataFunctionArgs } from "@remix-run/node";
 import { Response } from "@remix-run/node";
-import type { OrderCreatePayload, OrderDetailNote } from "../types/orders";
+import type { LineItem, OrderCreatePayload, OrderDetailNote } from "../types/orders";
 import { PaymentPlan } from "../constants";
 import type { KeyNumberMap, MaybeUserError } from "../types/common";
 import shopify from "../shopify.server";
@@ -8,8 +8,10 @@ import {
   ADD_DISCOUNT_MUTATION,
   ADD_VARIANT_MUTATION,
   BEGIN_EDIT_MUTATION,
+  COMMIT_ORDER_MUTATION,
   EDIT_QUANTITY_MUTATION,
 } from "../graphql";
+import { CurrencyCode} from "../graphql/generated/graphql";
 import type { Mutation } from "../graphql/generated/graphql";
 import { shopifyId } from "../lib/shopify";
 import type { ProductDetails } from "../types";
@@ -122,6 +124,16 @@ const variantDiscountMap = (lines: OrderLineItem[]) => {
   return discountsByVariant;
 };
 
+function parseOrderInfoFromNotes(note_attributes: any[], line_items: LineItem[]) {
+    const paymentPlan = paymentPlanFromNotes(note_attributes);
+    const discount_percentage = discountFromPaymentPlan(paymentPlan);
+    const orderDetails = orderDetailsFromNotes(note_attributes);
+    const quantitiesByVariant = summarizeQuantities(orderDetails);
+    const discountsByVariant = variantDiscountMap(line_items);
+    const primaryProduct = primaryProductFromNotes(note_attributes);
+    return { quantitiesByVariant, discount_percentage, primaryProduct, discountsByVariant };
+}
+
 export default async function postProcessOrder({ request }: DataFunctionArgs) {
   try {
     const { admin } = await shopify.authenticate.admin(request);
@@ -146,90 +158,120 @@ export default async function postProcessOrder({ request }: DataFunctionArgs) {
     const order = (await request.json()) as OrderCreatePayload;
     const { id: orderId, note_attributes, line_items, discount_codes } = order;
     checkIsProcessed(note_attributes, orderId);
-    const paymentPlan = paymentPlanFromNotes(note_attributes);
-    const discount_percentage = discountFromPaymentPlan(paymentPlan);
-    const orderDetails = orderDetailsFromNotes(note_attributes);
-    const quantitiesByVariant = summarizeQuantities(orderDetails);
-    const discountsByVariant = variantDiscountMap(line_items);
-    const primaryProduct = primaryProductFromNotes(note_attributes);
+    const { quantitiesByVariant, discount_percentage, primaryProduct } = parseOrderInfoFromNotes(note_attributes, line_items);
 
-    //begin edit
-    const response = await admin.graphql(BEGIN_EDIT_MUTATION, {
-      variables: { orderId: shopifyId(orderId, "Order") },
-    });
-    if (!response.ok) {
-      throw response;
-    }
+    (async function processAsync() {
+      const logLabel = `Processing order ${orderId}`;
 
-    const beginData = await graphql<Mutation["orderEditBegin"]>(
-      BEGIN_EDIT_MUTATION,
-      { orderId: shopifyId(orderId, "Order") }
-    );
-    const lines = beginData?.calculatedOrder?.lineItems?.edges.map(
-      ({ node }) => node
-    );
-    let calculatedOrderId = beginData?.calculatedOrder?.id;
+      try {
+        console.time(logLabel);
+        //begin edit
+        const beginData = await graphql<Mutation["orderEditBegin"]>(
+          BEGIN_EDIT_MUTATION,
+          { orderId: shopifyId(orderId, "Order") }
+        );
+        const lines = beginData?.calculatedOrder?.lineItems?.edges.map(
+          ({ node }) => node
+        );
+        let calculatedOrderId = beginData?.calculatedOrder?.id;
+        // delete all lines
+        // by setting quantity to zero
+        console.timeLog(
+          logLabel,
+          `Started order edit, calculated id: ${calculatedOrderId}`
+        );
+        console.timeLog(logLabel, `Deleting existing lines to be recreated`);
+        for (const { id } of lines ?? []) {
+          await graphql<Mutation["orderEditSetQuantity"]>(
+            EDIT_QUANTITY_MUTATION,
+            {
+              id: calculatedOrderId,
+              lineitemId: id,
+              quantity: 0,
+            }
+          );
 
-    // delete all lines
-    // by setting quantity to zero
-
-    for (const { id } of lines ?? []) {
-      await graphql<Mutation["orderEditSetQuantity"]>(EDIT_QUANTITY_MUTATION, {
-        id: calculatedOrderId,
-        lineitemId: id,
-        quantity: 0,
-      });
-    }
-
-    for (const [variant, quantity] of Object.entries(quantitiesByVariant)) {
-      const {
-        calculatedLineItem: { id: lineItemId },
-      } = await graphql<OrderAddVariantResponse>(ADD_VARIANT_MUTATION, {
-        id: calculatedOrderId,
-        variantId: shopifyId(Number(variant), "ProductVariant"),
-        quantity,
-      }).then((r) => r ?? {});
-      await graphql<OrderSetQuantity>(ADD_DISCOUNT_MUTATION, {
-        discount_percentage,
-        id: calculatedOrderId,
-        lineItemId,
-        discountDescription: "Payment Plan",
-      });
-      await graphql<OrderSetQuantity>(ADD_DISCOUNT_MUTATION, {
-        discount_percentage,
-        id: calculatedOrderId,
-        lineItemId,
-        discountDescription: "Payment Plan",
-      });
-
-      // adding existing discount code with their amount to the line of the primary product
-      if (variant === String(primaryProduct.variant)) {
-        for (const { code: description, amount, type } of discount_codes) {
-          const discount =
-            type === "fixed_amount"
-              ? { description, fixedValue: amount }
-              : { description, percentValue: amount };
+          console.timeLog(logLabel, `Line '${id}' has been deleted`);
+        }
+        console.timeLog(logLabel, `Started recreating lines`);
+        for (const [variant, quantity] of Object.entries(quantitiesByVariant)) {
+            console.timeLog(logLabel, `Creating line for variant ${variant}`);
+          const {
+            calculatedLineItem: { id: lineItemId },
+          } = await graphql<OrderAddVariantResponse>(ADD_VARIANT_MUTATION, {
+            id: calculatedOrderId,
+            variantId: shopifyId(Number(variant), "ProductVariant"),
+            quantity,
+          }).then((r) => r ?? {});
           await graphql<OrderSetQuantity>(ADD_DISCOUNT_MUTATION, {
-            discount,
+            discount_percentage,
             id: calculatedOrderId,
             lineItemId,
+            discountDescription: "Payment Plan",
           });
+          await graphql<OrderSetQuantity>(ADD_DISCOUNT_MUTATION, {
+            discount_percentage,
+            id: calculatedOrderId,
+            lineItemId,
+            discountDescription: "Payment Plan",
+          });
+
+          console.timeLog(logLabel, `succesfully created ${lineItemId}`);
+
+          // adding existing discount code with their amount to the line of the primary product
+          if (variant === String(primaryProduct.variant)) {
+            console.timeLog(logLabel, `Reapplying code discounts`);
+            for (const { code: description, amount, type } of discount_codes) {
+              const discount =
+                type === "fixed_amount"
+                  ? {
+                      description,
+                      fixedValue: { amount, currencyCode: CurrencyCode.Usd },
+                    }
+                  : { description, percentValue: amount };
+              await graphql<OrderSetQuantity>(ADD_DISCOUNT_MUTATION, {
+                discount,
+                id: calculatedOrderId,
+                lineItemId,
+              });
+              console.timeLog(logLabel, discount);
+            }
+          }
+
+          // TODO: Add discounts by variant
+
+          // Commit
+          console.timeLog(logLabel, 'Commiting order');
+          await graphql<Mutation["orderEditCommit"]>(COMMIT_ORDER_MUTATION, {
+            calculatedOrderId,
+          });
+
+          console.timeEnd(logLabel);
+        }
+      } catch (e) {
+        if (e instanceof Response) {
+          return console.error(await e.text());
+        } else {
+          console.error(JSON.stringify(e));
         }
       }
+    })();
 
-      // TODO: Add discounts by variant
-
-      return new Response("Order processes succesfully", { status: 200 });
-    }
+    return new Response(
+        "Order processed",
+        { status: 200 }
+    );
   } catch (e) {
     console.error(JSON.stringify(e));
-    if(e instanceof Response) {
-        return e;
+    if (e instanceof Response) {
+      return e;
     }
 
     return new Response(
-        "An error ocurred while processing the created order, check the logs",
-        { status: 500}
+      "An error ocurred while processing the created order, check the logs",
+      { status: 500 }
     );
   }
 }
+
+

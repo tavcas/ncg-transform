@@ -50,14 +50,11 @@ mutation addVariantsToOrder($id: ID!, $variantId: ID!, $quantity: Int!) {
 }`;
 
 export const ADD_DISCOUNT_MUTATION = `#graphql
-mutation applyDiscountToLineItems($orderId: ID!, $lineItemId: ID!, $discount_percentage: Float!, $discountDescription: String) {
+mutation applyDiscountToLineItems($orderId: ID!, $lineItemId: ID!, $discount: OrderEditAppliedDiscountInput!) {
     orderEditAddLineItemDiscount(
         id: $orderId, 
         lineItemId: $lineItemId, 
-        discount: { 
-            fixedValue: { currencyCode: USD, amount: $discountAmount } 
-            description: $discountDescription 
-        }) {
+        discount: $discount) {
             calculatedOrder {
                 id
             }
@@ -86,3 +83,20 @@ mutation orderEditSetQuantity($id: ID!, $lineItemId: ID!, $quantity: Int!) {
   }
 }
 `;
+
+export const COMMIT_ORDER_MUTATION = `#graphql
+mutation commitEdit($calculatedOrderId: ID!) {  
+  orderEditCommit(
+    id: $calculatedOrderId, 
+    notifyCustomer: false, 
+    staffNote: "For pricing plan purposes") 
+  {    
+    order {
+      id    
+    }    
+    userErrors {      
+      field      
+      message    
+    }  
+  }
+}`;

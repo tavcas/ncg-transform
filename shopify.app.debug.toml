@@ -23,7 +23,11 @@ redirect_urls = [
 ]
 
 [webhooks]
-api_version = "2023-07"
+api_version = "2024-01"
+
+[[webhooks.subscriptions]]
+topics = ["orders/create"]
+uri = "https://republican-millions-cognitive-fire.trycloudflare.com/webhooks"
 
 [pos]
 embedded = false
