@@ -3,7 +3,7 @@
 client_id = "952fc59953bdc2206b9ead351b810388"
 name = "ncg-transform-dev"
 handle = "ncg-transform-dev"
-application_url = "https://republican-millions-cognitive-fire.trycloudflare.com"
+application_url = "https://recognize-dean-beijing-channels.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,17 +17,17 @@ scopes = "read_products,write_cart_transforms,write_discounts,write_discounts_al
 
 [auth]
 redirect_urls = [
-  "https://republican-millions-cognitive-fire.trycloudflare.com/auth/callback",
-  "https://republican-millions-cognitive-fire.trycloudflare.com/auth/shopify/callback",
-  "https://republican-millions-cognitive-fire.trycloudflare.com/api/auth/callback"
+  "https://recognize-dean-beijing-channels.trycloudflare.com/auth/callback",
+  "https://recognize-dean-beijing-channels.trycloudflare.com/auth/shopify/callback",
+  "https://recognize-dean-beijing-channels.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
 api_version = "2024-01"
 
-[[webhooks.subscriptions]]
-topics = ["orders/create"]
-uri = "https://republican-millions-cognitive-fire.trycloudflare.com/webhooks"
+  [[webhooks.subscriptions]]
+  topics = [ "orders/create" ]
+  uri = "/webhooks"
 
 [pos]
 embedded = false

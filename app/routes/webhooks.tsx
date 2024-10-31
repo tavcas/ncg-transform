@@ -13,7 +13,7 @@ export const action = async (args: DataFunctionArgs) => {
         await db.session.deleteMany({ where: { shop } });
       }
       break;
-    case "ORDER_CREATED":
+    case "ORDERS_CREATE":
       return await postProcessOrder(args);
     case "CUSTOMERS_DATA_REQUEST":
     case "CUSTOMERS_REDACT":
