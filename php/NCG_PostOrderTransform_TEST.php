@@ -35,6 +35,10 @@ if (file_exists($order_ids_file)) {
 $note_attributes = $orders['note_attributes'];
 print_r($note_attributes);
 
+//for (const { code: description, amount, type } of discount_codes) {
+$discount_codes = $orders['discount_codes'];
+print_r($discount_codes);
+
 // Define key variables for processing
 $payment_plan = 0;
 $discount_percentage = 0;
@@ -56,6 +60,17 @@ for ($x = 0; $x < $note_attributes_size; $x++) {
 
 // Continue with additional processing only if it's a payment plan order
 if ($payment_plan == 1) {
+
+    // looking for primary looking up Primary Product Details
+    $primary_details = null;
+    for($x = 0; $x < $note_attributes_size; $x++) {
+        $name = $note_attributes[$x]['name'];
+        $value = $note_attributes[$x]['valu'];
+        if($name == "Primary Product Details") {
+            $primary_details = json_decode($value, true);
+        }
+    }
+
     $SKU_array = [];
     for ($x = 0; $x < $note_attributes_size; $x++) {
         $name = $note_attributes[$x]['name'];
@@ -206,9 +221,11 @@ GRAPHQL;
         $mutationBody .= '    variantId: "gid://shopify/ProductVariant/' . $SKU_array[$i]['variant'] . "\"\n";
         $mutationBody .= "    quantity: ".$SKU_array[$i]['quantity']." \n  ) {\n";
         $mutationBody .= "    calculatedOrder {\n      id\n    }\n";
-        $mutationBody .= "    calculatedLineItem {\n      id\n    }\n";
+        $mutationBody .= "    calculatedLineItem {\n      id\n  merchandise { ...on ProductVariant { id } }   }\n";
         $mutationBody .= "    userErrors {\n      field\n      message\n    }\n  }\n\n";
     }
+
+    
 
     $completeMutation = "mutation addVariantsToOrder {\n" . $mutationBody . "}";
     $completeMutationJson = json_encode([
@@ -251,7 +268,12 @@ GRAPHQL;
             if (isset($variant['calculatedOrder']) && isset($variant['calculatedLineItem'])) {
                 $orderId = $variant['calculatedOrder']['id'];
                 $lineItemId = $variant['calculatedLineItem']['id'];
-    
+
+                //capturing the lineItemId for the primary details
+                if($primary_details !== null && $primary_details['variant'] == $variant['merchandise']['id']) {
+                    $primary_line_item = $lineItemId;
+                }
+                
                 // Determine the numeric index from the mutation name
                 $numericIndex = filter_var($index, FILTER_SANITIZE_NUMBER_INT) - 1;
     
@@ -344,7 +366,59 @@ GRAPHQL;
     curl_close($curl);
     echo $response;
     
-    
+    // Begin adding discount codes to primary product {
+    if(isset($primary_line_item) && isset($discount_codes)) {
+        for($discount_codes as $index => $discount) {
+            $description = $discount['code'];
+            $amount = $discount['amount'];
+
+            $discountVariable = array(
+                "description" => $description,
+                "percentValue" => $amount
+            )
+            if($discount['type'] === 'fixed_amount') {
+                $discountVariable = array(
+                    "description" => $description,
+                    "fixedValue" => array(
+                        "amount" => $amount,
+                        "currencyCode" => "USD"
+                    )
+                )
+            }
+
+            $payload = array(
+                "query" => "",
+                "variables" => array(
+                    "id" => $numericID,
+                    "lineItemId" => $primary_line_item
+                    "discount" => $discountVariable
+                )
+                );
+                $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => SHOPIFY_LINK.'/admin/api/2023-07/graphql.json',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => json_encode($payload),
+                    CURLOPT_HTTPHEADER => array(
+                        'X-Shopify-Access-Token: '.SHOPIFY_ACCESS_TOKEN,
+                        'Content-Type: application/json',
+                        SHOPIFY_APP_API_KEY.':'.SHOPIFY_APP_PASSWORD
+                    ),
+                ));
+            
+                $response = curl_exec($curl);
+            
+                curl_close($curl);
+                echo $response;
+        }
+    }
 
 
     $curl = curl_init();
