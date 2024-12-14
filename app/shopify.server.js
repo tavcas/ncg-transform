@@ -3,16 +3,17 @@ import {
   AppDistribution,
   DeliveryMethod,
   shopifyApp,
-  LATEST_API_VERSION,
 } from "@shopify/shopify-app-remix";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import { restResources } from "@shopify/shopify-api/rest/admin/2023-07";
 
-import prisma from "./db.server";
+import prisma from "./db.server.js";
 
+const LATEST_API_VERSION = "2024-10";
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
+  // @ts-ignore
   apiVersion: LATEST_API_VERSION,
   scopes: process.env.SCOPES?.split(","),
   appUrl: process.env.SHOPIFY_APP_URL || "",
@@ -25,10 +26,15 @@ const shopify = shopifyApp({
       deliveryMethod: DeliveryMethod.Http,
       callbackUrl: "/webhooks",
     },
+    ORDERS_CREATE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks",
+    },
   },
   hooks: {
-    afterAuth: async ({ session }) => {
-      shopify.registerWebhooks({ session });
+    afterAuth: async (args) => {
+      console.log("afterAuth hook");
+      shopify.registerWebhooks({ session: args.session });
     },
   },
   ...(process.env.SHOP_CUSTOM_DOMAIN

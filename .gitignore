@@ -1,4 +1,5 @@
 node_modules
+dist
 
 /.cache
 /build
@@ -8,6 +9,7 @@ node_modules
 /prisma/dev.sqlite
 /prisma/dev.sqlite-journal
 database.sqlite
+
 
 .env
 package-lock.json

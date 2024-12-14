@@ -1,37 +1,48 @@
+// @ts-nocheck
 import React from "react";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useRouteError } from "@remix-run/react";
+import { AppProvider } from "@shopify/shopify-app-remix/react";
 import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
+import { AppProvider as DiscountProvider } from "@shopify/discount-app-components";
+
 import polarisStyles from "@shopify/polaris/build/esm/styles.css";
 import { boundary } from "@shopify/shopify-app-remix";
 
 import { authenticate } from "../shopify.server";
+import loadFunctions from "../actions/loadFunctions";
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
-export async function loader({ request }) {
-  await authenticate.admin(request);
-
+export async function loader(args) {
+  await authenticate.admin(args.request);
+  const loadResponse = await loadFunctions(args);
+  if(loadResponse.status != 200) {
+    return loadResponse;
+  }
   return json({
     polarisTranslations: require("@shopify/polaris/locales/en.json"),
     apiKey: process.env.SHOPIFY_API_KEY,
+    orderDiscountId: process.env.SHOPIFY_ORDER_DISCOUNTS_ID
   });
 }
 
 export default function App() {
-  const { apiKey, polarisTranslations } = useLoaderData();
+  const { apiKey, polarisTranslations, orderDiscountId } = useLoaderData();
 
   return (
-    <>
+    <AppProvider isEmbeddedApp apiKey={apiKey}>
       <script
         src="https://cdn.shopify.com/shopifycloud/app-bridge.js"
         data-api-key={apiKey}
       />
+
+      <DiscountProvider locale="en-US" ianaTimezone="America/New_York">
       <ui-nav-menu>
         <Link to="/app" rel="home">
           Home
         </Link>
-        <Link to="/app/additional">Additional page</Link>
+        <Link to={`/app/discounts/order/${orderDiscountId}/new`}>Create order discount</Link>
       </ui-nav-menu>
       <PolarisAppProvider
         i18n={polarisTranslations}
@@ -39,7 +50,8 @@ export default function App() {
       >
         <Outlet />
       </PolarisAppProvider>
-    </>
+      </DiscountProvider>
+    </AppProvider>
   );
 }
 
