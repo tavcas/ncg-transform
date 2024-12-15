@@ -1,0 +1,21 @@
+{
+    "cart": {
+      "plan": {
+        "value": "Bi-Monthly"
+      },
+      "lines": [
+        {
+          "id": "gid://shopify/CartLine/1ad0c242-d9da-4f05-937e-8409fe919c08",
+          "quantity": 1,
+          "cost": {
+            "subtotalAmount": {
+              "amount": "2070.0"
+            }
+          },
+          "plan": {
+            "value": "Monthly"
+          }
+        }
+      ]
+    }
+  }

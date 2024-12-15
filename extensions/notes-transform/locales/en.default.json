@@ -1,0 +1,5 @@
+{
+  "welcome": "Welcome to the {{target}} extension!",
+  "iWouldLikeAFreeGiftWithMyOrder": "I would like to receive a free gift with my order",
+  "attributeChangesAreNotSupported": "Error: App not authorized to update notes"
+}

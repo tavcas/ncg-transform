@@ -1,0 +1,27 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "952fc59953bdc2206b9ead351b810388"
+name = "ncg-transform-dev"
+handle = "ncg-transform-dev"
+application_url = "https://ncg-transform-dev-874ed72e91b8.herokuapp.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_discounts,read_orders,read_products,write_cart_transforms,write_discounts,write_orders,write_products"
+
+[auth]
+redirect_urls = [
+  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/auth/callback",
+  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/auth/shopify/callback",
+  "https://ncg-transform-dev-874ed72e91b8.herokuapp.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+[pos]
+embedded = false

@@ -1,0 +1,14 @@
+query RunInput {
+  cart {
+    plan: attribute(key: "Payment Plan") { value }
+    lines { 
+      id, 
+      quantity,
+      cost {
+        subtotalAmount { amount }
+      }
+      plan: attribute(key: "Payment plan") { value }
+      
+    }
+  }   
+}
